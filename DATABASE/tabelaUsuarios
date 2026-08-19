@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "usuários" (
+CREATE TABLE IF NOT EXISTS "usuarios" (
 	"id" SERIAL PRIMARY KEY,
 	"login" VARCHAR(50),
 	"senha" VARCHAR(255),
