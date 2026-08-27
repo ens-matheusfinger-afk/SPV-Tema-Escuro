@@ -1,7 +1,0 @@
-CREATE TABLE IF NOT EXISTS "usuarios" (
-	"id" SERIAL PRIMARY KEY,
-	"login" VARCHAR(50),
-	"senha" VARCHAR(255),
-	"nome" VARCHAR(150),
-	"status" NUMERIC
-);
