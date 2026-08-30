@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/clientesCNPJController');
+const controller = require('../controllers/clientesCNPJControllers');
 
 router.get('/',controller.listar);
 router.get('/:id',controller.buscar);

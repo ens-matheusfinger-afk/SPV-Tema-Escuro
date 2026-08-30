@@ -1,4 +1,4 @@
-const ClienteCNPJ = require('../models/clientesCNPJModel');
+const ClienteCNPJ = require('../models/clientesCNPJModels');
 
 async function listar(req,res){
     try{

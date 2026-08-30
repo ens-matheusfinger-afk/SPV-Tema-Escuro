@@ -1,4 +1,4 @@
-const ClienteCPF = require('../models/clientesCPFModel');
+const ClienteCPF = require('../models/clientesCPFModels');
 
 async function listar(req,res){
     try{

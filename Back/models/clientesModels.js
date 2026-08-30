@@ -33,7 +33,8 @@ const Cliente = sequelize.define('Cliente', {
 },
 {
     tableName: 'clientes',
-    timestamps: false
+    timestamps: false,
+    underscored: true // padrão do projeto: camelCase (JS) <-> snake_case (banco, sem aspas)
 });
 
 module.exports = Cliente;

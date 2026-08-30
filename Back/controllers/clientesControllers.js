@@ -1,6 +1,6 @@
-const Cliente = require('../models/clientesModel');
-const ClienteCPF = require('../models/clientesCPFModel');
-const ClienteCNPJ = require('../models/clientesCNPJModel');
+const Cliente = require('../models/clientesModels');
+const ClienteCPF = require('../models/clientesCPFModels');
+const ClienteCNPJ = require('../models/clientesCNPJModels');
 
 async function listar(req,res){
     try{

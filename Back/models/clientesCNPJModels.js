@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Cliente = require('./clientesModel');
+const Cliente = require('./clientesModels');
 
 const ClienteCNPJ = sequelize.define('ClienteCNPJ', {
 
@@ -27,8 +27,9 @@ const ClienteCNPJ = sequelize.define('ClienteCNPJ', {
 
 },
 {
-    tableName: 'clientesCNPJ',
-    timestamps: false
+    tableName: 'clientes_cnpj',
+    timestamps: false,
+    underscored: true // idCliente/nomeFantasia (JS) <-> id_cliente/nome_fantasia (banco)
 });
 
 Cliente.hasOne(ClienteCNPJ, { foreignKey: 'idCliente' });
