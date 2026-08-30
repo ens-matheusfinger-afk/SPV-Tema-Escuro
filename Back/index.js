@@ -7,8 +7,6 @@ app.get('/', (req, res) => {
 })
 
 app.use(express.json());
-const usuariosRoute = require('./routes/usuariosRoute');
-app.use('/usuarios', usuariosRoute);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
