@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Usuario = require('./usuariosModel');
+const Usuario = require('./usuariosModels');
 const Cliente = require('./clientesModels');
 
 // REQ004 - Gerar Pedidos / REQ005 - Alterar estado do pedido

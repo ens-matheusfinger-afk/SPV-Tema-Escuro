@@ -4,12 +4,15 @@ const sequelize = require('./config/database');
 const produtosRoutes = require('./routes/produtosRoutes');
 const estoqueRoutes = require('./routes/estoqueRoutes');
 const servicosRoutes = require('./routes/servicosRoutes');
-const usuariosRoute = require('./routes/usuariosRoute');
+const usuariosRoutes = require('./routes/usuariosRoutes');
 const pedidosRoutes = require('./routes/pedidosRoutes');
 const caixaRoutes = require('./routes/caixaRoutes');
 const clientesRoutes = require('./routes/clientesRoutes');
 const clientesCPFRoutes = require('./routes/clientesCPFRoutes');
 const clientesCNPJRoutes = require('./routes/clientesCNPJRoutes');
+const contasPagarRoutes = require('./routes/contasPagarRoutes');
+const contasReceberRoutes = require('./routes/contasReceberRoutes');
+const movimentacoesRoutes = require('./routes/movimentacoesRoutes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -23,12 +26,15 @@ app.get('/', (req, res) => {
 app.use('/produtos', produtosRoutes);
 app.use('/estoque', estoqueRoutes);
 app.use('/servicos', servicosRoutes);
-app.use('/usuarios', usuariosRoute);
+app.use('/usuarios', usuariosRoutes);
 app.use('/pedidos', pedidosRoutes);
 app.use('/caixa', caixaRoutes);
 app.use('/clientes', clientesRoutes);
 app.use('/clientes-cpf', clientesCPFRoutes);
 app.use('/clientes-cnpj', clientesCNPJRoutes);
+app.use('/contas-pagar', contasPagarRoutes);
+app.use('/contas-receber', contasReceberRoutes);
+app.use('/movimentacoes', movimentacoesRoutes);
 
 sequelize
   .authenticate()

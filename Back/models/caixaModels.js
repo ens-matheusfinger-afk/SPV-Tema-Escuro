@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Usuario = require('./usuariosModel');
+const Usuario = require('./usuariosModels');
 const Pedidos = require('./pedidosModels');
 
 // REQ013 - Módulo de Fechamento de Caixa

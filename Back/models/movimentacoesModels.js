@@ -1,38 +1,66 @@
-const db = require('../config/db');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-class MovimentacoesModel {
-    static async receber(dados) {
-        const { idReceber, idUsuario, valorTotal } = dados;
-        const [result] = await db.query(
-            `INSERT INTO movimentacoes (tipo, idReceber, idUsuario, valorTotal) VALUES ('RECEBER', ?, ?, ?)`,
-            [idReceber, idUsuario, valorTotal]
-        );
-        return result.insertId;
+const Movimentacoes = sequelize.define('Movimentacoes', {
+
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+
+    tipo: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+    },
+
+    idReceber: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+
+    idPagar: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+
+    idUsuario: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+
+    valorTotal: {
+        type: DataTypes.DECIMAL(10,2),
+        allowNull: false
     }
 
-    static async Pagar(dados) {
-        const { idPagar, idUsuario, valorTotal } = dados;
-        const [result] = await db.query(
-            `INSERT INTO movimentacoes (tipo, idPagar, idUsuario, valorTotal) VALUES ('PAGAR', ?, ?, ?)`,
-            [idPagar, idUsuario, valorTotal]
-        );
-        return result.insertId;
-    }
+},
+{
+    tableName: 'movimentacoes',
+    timestamps: false
+});
 
-    static async receberDesconto(dados) {
-        const { idReceber, idUsuario, valorTotal, desconto } = dados;
-        const valorFinal = valorTotal - (desconto || 0);
-        const [result] = await db.query(
-            `INSERT INTO movimentacoes (tipo, idReceber, idUsuario, valorTotal) VALUES ('RECEBER_DESCONTO', ?, ?, ?)`,
-            [idReceber, idUsuario, valorFinal]
-        );
-        return result.insertId;
-    }
+Movimentacoes.receber = async function(dados){
+    const { idReceber, idUsuario, valorTotal } = dados;
+    const registro = await Movimentacoes.create({ tipo:'RECEBER', idReceber, idUsuario, valorTotal });
+    return registro.id;
+};
 
-    static async listarTudo() {
-        const [rows] = await db.query(`SELECT * FROM movimentacoes`);
-        return rows;
-    }
-}
+Movimentacoes.Pagar = async function(dados){
+    const { idPagar, idUsuario, valorTotal } = dados;
+    const registro = await Movimentacoes.create({ tipo:'PAGAR', idPagar, idUsuario, valorTotal });
+    return registro.id;
+};
 
-module.exports = MovimentacoesModel;
+Movimentacoes.receberDesconto = async function(dados){
+    const { idReceber, idUsuario, valorTotal, desconto } = dados;
+    const valorFinal = valorTotal - (desconto || 0);
+    const registro = await Movimentacoes.create({ tipo:'RECEBER_DESCONTO', idReceber, idUsuario, valorTotal:valorFinal });
+    return registro.id;
+};
+
+Movimentacoes.listarTudo = async function(){
+    return await Movimentacoes.findAll();
+};
+
+module.exports = Movimentacoes;

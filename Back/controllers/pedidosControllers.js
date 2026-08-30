@@ -3,7 +3,7 @@ const ItensPedido = require('../models/itensPedidoModels');
 const Produtos = require('../models/produtosModels');
 const Servicos = require('../models/servicosModels');
 const Estoque = require('../models/estoqueModels');
-const Usuario = require('../models/usuariosModel');
+const Usuario = require('../models/usuariosModels');
 
 const STATUS_CANCELADO = 6;
 const STATUS_FINALIZADO = 5;

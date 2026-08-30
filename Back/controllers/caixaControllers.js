@@ -1,6 +1,6 @@
 const { Op } = require('sequelize');
 const Caixa = require('../models/caixaModels');
-const Usuario = require('../models/usuariosModel');
+const Usuario = require('../models/usuariosModels');
 const Pedidos = require('../models/pedidosModels');
 
 // Monta o intervalo [00:00:00, 23:59:59] de uma data 'YYYY-MM-DD' (ou hoje, se omitida)

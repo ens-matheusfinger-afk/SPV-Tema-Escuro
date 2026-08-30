@@ -1,31 +1,72 @@
-const db = require('../config/db');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-class ContasPagarModel {
-    static async criarPendencia(dados) {
-        const { item, tipo, descricao, dataPagamento, valor } = dados;
-        const [result] = await db.query(
-            `INSERT INTO contasPagar (item, tipo, descricao, dataPagamento, valor) VALUES (?, ?, ?, ?, ?)`,
-            [item, tipo, descricao, dataPagamento, valor]
-        );
-        return result.insertId;
+const ContasPagar = sequelize.define('ContasPagar', {
+
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+
+    item: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+
+    tipo: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+    },
+
+    descricao: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
+
+    dataPagamento: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+    },
+
+    dataCriacao: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        defaultValue: DataTypes.NOW
+    },
+
+    valor: {
+        type: DataTypes.DECIMAL(10,2),
+        allowNull: false
     }
 
-    static async editarPendencia(id, dados) {
-        const { item, tipo, descricao, dataPagamento, valor } = dados;
-        await db.query(
-            `UPDATE contasPagar SET item = ?, tipo = ?, descricao = ?, dataPagamento = ?, valor = ? WHERE id = ?`,
-            [item, tipo, descricao, dataPagamento, valor, id]
-        );
-    }
+},
+{
+    tableName: 'contasPagar',
+    timestamps: false
+});
 
-    static async excluirPendencia(id) {
-        await db.query(`DELETE FROM contasPagar WHERE id = ?`, [id]);
-    }
+ContasPagar.criarPendencia = async function(dados){
+    const { item, tipo, descricao, dataPagamento, dataCriacao, valor } = dados;
+    const registro = await ContasPagar.create({ item, tipo, descricao, dataPagamento, dataCriacao, valor });
+    return registro.id;
+};
 
-    static async listarTudo() {
-        const [rows] = await db.query(`SELECT * FROM contasPagar`);
-        return rows;
-    }
-}
+ContasPagar.editarPendencia = async function(id, dados){
+    const { item, tipo, descricao, dataPagamento, dataCriacao, valor } = dados;
+    const registro = await ContasPagar.findByPk(id);
+    if(!registro) throw new Error('Pendência não encontrada.');
+    await registro.update({ item, tipo, descricao, dataPagamento, dataCriacao, valor });
+};
 
-module.exports = ContasPagarModel;
+ContasPagar.excluirPendencia = async function(id){
+    const registro = await ContasPagar.findByPk(id);
+    if(!registro) throw new Error('Pendência não encontrada.');
+    await registro.destroy();
+};
+
+ContasPagar.listarTudo = async function(){
+    return await ContasPagar.findAll();
+};
+
+module.exports = ContasPagar;
