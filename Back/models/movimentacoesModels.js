@@ -63,4 +63,4 @@ Movimentacoes.listarTudo = async function(){
     return await Movimentacoes.findAll();
 };
 
-module.exports = Movimentacoes;
+module.exports = Movimentacoes; 

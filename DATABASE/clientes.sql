@@ -1,0 +1,20 @@
+CREATE TABLE clientes (
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(150) NOT NULL,
+	telefone VARCHAR(255),
+	email VARCHAR(100),
+	status BOOLEAN NOT NULL DEFAULT true
+);
+
+CREATE TABLE clientesCPF (
+	id SERIAL PRIMARY KEY,
+	idCliente INTEGER NOT NULL REFERENCES clientes(id),
+	cpf VARCHAR(11)
+);
+
+CREATE TABLE clientesCNPJ (
+	id SERIAL PRIMARY KEY,
+	idCliente INTEGER NOT NULL REFERENCES clientes(id),
+	cnpj VARCHAR(14) NOT NULL,
+	nomeFantasia VARCHAR(150)
+);

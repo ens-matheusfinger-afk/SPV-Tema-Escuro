@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS estoque (
+	id SERIAL PRIMARY KEY,
+	id_produto INTEGER NOT NULL UNIQUE REFERENCES produtos(id) ON DELETE CASCADE,
+	estoque_atual INTEGER NOT NULL DEFAULT 0,
+	estoque_minimo INTEGER NOT NULL DEFAULT 0,
+	estoque_maximo INTEGER
+);

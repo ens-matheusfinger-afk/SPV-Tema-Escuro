@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS produtos (
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(150) NOT NULL,
+	descricao VARCHAR(255),
+	valor NUMERIC(10,2) NOT NULL,
+	controla_estoque BOOLEAN NOT NULL DEFAULT false
+);

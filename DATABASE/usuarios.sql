@@ -1,18 +1,14 @@
 CREATE TABLE "usuarios" (
 	"id" SERIAL PRIMARY KEY,
-	"login" VARCHAR(50),
-	"senha" VARCHAR(255),
-	"nome" VARCHAR(150),
-	"status" NUMERIC NOT NULL
+	"login" VARCHAR(50) NOT NULL UNIQUE,
+	"senha" VARCHAR(255) NOT NULL,
+	"nome" VARCHAR(150) NOT NULL,
+	"status" NUMERIC NOT NULL DEFAULT 1
 );
 
-INSERT INTO usuarios (login, senha, nome, status)
-VALUES ('diego', 'senha_hash', 'Diego', 1),
-('matheus', 'nInteressa', 'Matheus Finger.', 1),
-('carlos', 'Conhece?', 'Carlos Borges', 1),
-('Felipe', 'Graxa123', 'Felipe J.', 1),
-('Maria', 'FFFkk123', 'Maria', 1),
-('Mariana', 'caboCriatividade', 'Mariana', 1),
-('Cuiudo', 'caboCriatividade', 'Cuiudo B.', 0),
-('Serjão', 'caboCriatividade', 'Serjão B.', 0),
-('Zezo', 'ChegaDeUsuario', 'Zezo Zezão', 0);
+CREATE TABLE "usuarioTela" (
+	"id" SERIAL PRIMARY KEY,
+	"idUsuario" INTEGER NOT NULL REFERENCES "usuarios"(id),
+	"tela" VARCHAR(100) NOT NULL,
+	"podeAcessar" BOOLEAN NOT NULL DEFAULT false
+);
