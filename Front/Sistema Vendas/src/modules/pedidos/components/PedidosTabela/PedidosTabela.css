@@ -1,0 +1,9 @@
+/* Tabela de pedidos (linha inteira clicável) */
+
+.spv-linha-clicavel {
+  cursor: pointer;
+}
+
+.spv-linha-clicavel:hover td {
+  background: var(--spv-primary-soft);
+}

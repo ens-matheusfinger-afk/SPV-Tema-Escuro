@@ -1,0 +1,6 @@
+/* Novo pedido: resumo fixo ao rolar a tela */
+
+.spv-resumo {
+  position: sticky;
+  top: 4.5rem;
+}

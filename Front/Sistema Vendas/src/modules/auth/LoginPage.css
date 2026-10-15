@@ -1,0 +1,20 @@
+/* Tela de login */
+
+/* ---------- Login ---------- */
+
+.spv-login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: var(--spv-bg);
+}
+
+.spv-login-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 2rem;
+  background: var(--spv-surface);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(30, 41, 59, 0.08);
+}

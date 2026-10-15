@@ -1,0 +1,26 @@
+/* Estrutura das telas logadas: menu lateral + área de conteúdo */
+
+/* ---------- Layout do sistema ---------- */
+
+.spv-app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.spv-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.spv-content {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+@media (max-width: 575.98px) {
+  .spv-content {
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,33 @@
+/* Versão impressa do pedido: folha A4 e etiqueta (REQ008) */
+
+.spv-impressao-a4 {
+  font-size: 11pt;
+  color: #000;
+}
+
+.spv-impressao-a4 table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.spv-impressao-a4 th,
+.spv-impressao-a4 td {
+  border-bottom: 1px solid #ccc;
+  padding: 4pt 6pt;
+  text-align: left;
+}
+
+.spv-etiqueta {
+  width: 94mm;
+  border: 1.5pt solid #000;
+  border-radius: 3mm;
+  padding: 3mm 4mm;
+  color: #000;
+  font-size: 10pt;
+}
+
+.spv-etiqueta-numero {
+  font-size: 28pt;
+  font-weight: 800;
+  line-height: 1;
+}

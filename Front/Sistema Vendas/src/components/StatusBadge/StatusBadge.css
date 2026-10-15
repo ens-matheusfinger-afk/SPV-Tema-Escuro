@@ -1,0 +1,7 @@
+/* Selo de status do pedido */
+
+.spv-status {
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.35em 0.7em;
+}

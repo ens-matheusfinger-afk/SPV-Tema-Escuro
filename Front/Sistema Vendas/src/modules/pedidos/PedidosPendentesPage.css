@@ -1,0 +1,36 @@
+/* Cartões de contagem por status (REQ040 — gestão visual) */
+
+/* Cartões de contagem por status (REQ040 — gestão visual) */
+.spv-contador {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  padding: 0.9rem 1rem;
+  background: var(--spv-surface);
+  border: 1px solid var(--spv-border);
+  border-left: 4px solid var(--cor, var(--spv-sky));
+  border-radius: 0.6rem;
+  color: var(--spv-ink);
+}
+
+.spv-contador:hover {
+  border-color: var(--cor, var(--spv-sky));
+}
+
+.spv-contador.ativo {
+  background: var(--spv-primary-soft);
+  border-color: var(--cor, var(--spv-sky));
+  box-shadow: 0 0 0 1px var(--cor, var(--spv-sky));
+}
+
+.spv-contador-numero {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.spv-contador-rotulo {
+  font-size: 0.8rem;
+  color: var(--spv-muted);
+}

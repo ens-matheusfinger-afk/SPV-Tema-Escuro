@@ -1,0 +1,140 @@
+/* Menu lateral (no desktop fica fixo; abaixo de lg vira gaveta/Offcanvas) */
+
+/* Sidebar: no desktop fica fixa; abaixo de lg vira gaveta (Offcanvas) */
+.spv-sidebar.offcanvas-lg {
+  --bs-offcanvas-width: var(--spv-sidebar-width);
+  background: var(--spv-surface);
+  border-right: 1px solid var(--spv-border);
+}
+
+@media (min-width: 992px) {
+  .spv-sidebar.offcanvas-lg {
+    /* o Bootstrap força fundo transparente no offcanvas-lg; aqui a sidebar volta a ser branca */
+    background-color: var(--spv-surface) !important;
+    width: var(--spv-sidebar-width);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+}
+
+.spv-sidebar .offcanvas-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  height: 100%;
+}
+
+.spv-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--spv-border);
+}
+
+.spv-brand-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+
+.spv-brand-sub {
+  font-size: 0.72rem;
+  color: var(--spv-muted);
+}
+
+.spv-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0.6rem;
+}
+
+.spv-nav-link,
+.spv-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: none;
+  color: var(--spv-ink);
+  font-size: 0.875rem;
+  text-align: left;
+  text-decoration: none;
+}
+
+.spv-nav-link:hover,
+.spv-nav-group:hover {
+  background: var(--spv-bg);
+  color: var(--spv-ink);
+}
+
+.spv-nav-link i,
+.spv-nav-group i {
+  font-size: 1rem;
+  color: var(--spv-muted);
+}
+
+.spv-nav-group .spv-chevron {
+  margin-left: auto;
+  font-size: 0.7rem;
+  transition: transform 0.15s ease;
+}
+
+.spv-nav-group[aria-expanded='true'] .spv-chevron {
+  transform: rotate(180deg);
+}
+
+.spv-nav-sub {
+  padding-left: 1.1rem;
+}
+
+.spv-nav-sub .spv-nav-link {
+  font-size: 0.83rem;
+  padding: 0.4rem 0.7rem;
+}
+
+.spv-nav-link.active {
+  background: var(--spv-primary-soft);
+  color: var(--spv-primary);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--spv-sky);
+}
+
+.spv-nav-link.active i {
+  color: var(--spv-primary);
+}
+
+.spv-user {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border-top: 1px solid var(--spv-border);
+}
+
+/* ---------- Rodapé da sidebar (link para Meu usuário) ---------- */
+
+.spv-user-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  flex: 1;
+  padding: 0.25rem;
+  margin: -0.25rem;
+  border-radius: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.spv-user-link:hover,
+.spv-user-link.active {
+  background: var(--spv-bg);
+  color: inherit;
+}

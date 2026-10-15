@@ -1,111 +1,217 @@
+/*
+ * SYS VENDAS — estilos GLOBAIS (valem para o sistema inteiro)
+ * Aqui ficam: variáveis de cor, body, ajustes do Bootstrap, padrões usados em
+ * várias telas (cartões, tabelas, rótulos) e as regras gerais de impressão.
+ * Estilo de UM componente fica no .css dentro da pasta dele.
+ *
+ * Paleta oficial (Documento de Visão, Anexo Identidade Visual):
+ *   #3DA7FD Cool Sky · #27D9AA Tropical Mint · #06D6A0 Emerald
+ *
+ * As cores da marca são claras demais para texto branco por cima (contraste baixo),
+ * então botões e links usam um tom mais escuro do Cool Sky (--spv-primary).
+ * A cor pura da marca fica para detalhes: item ativo do menu, bordas, foco, logo.
+ */
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Marca */
+  --spv-sky: #3da7fd;
+  --spv-mint: #27d9aa;
+  --spv-emerald: #06d6a0;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Derivadas para uso em UI */
+  --spv-primary: #0f78cc;
+  --spv-primary-hover: #0b6fbe;
+  --spv-primary-soft: #e8f4ff;
+  --spv-ink: #1e293b;
+  --spv-muted: #64748b;
+  --spv-border: #e2e8f0;
+  --spv-bg: #f1f4f8;
+  --spv-surface: #ffffff;
+  --spv-sidebar-width: 248px;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+  /* Bootstrap */
+  --bs-primary: var(--spv-primary);
+  --bs-primary-rgb: 15, 120, 204;
+  --bs-success: var(--spv-emerald);
+  --bs-success-rgb: 6, 214, 160;
+  --bs-link-color: var(--spv-primary);
+  --bs-link-color-rgb: 15, 120, 204;
+  --bs-link-hover-color: var(--spv-primary-hover);
+  --bs-link-hover-color-rgb: 11, 111, 190;
+  --bs-body-color: var(--spv-ink);
+  --bs-body-bg: var(--spv-bg);
+  --bs-border-color: var(--spv-border);
+  --bs-border-radius: 0.5rem;
+  --bs-focus-ring-color: rgba(61, 167, 253, 0.35);
 }
 
 body {
-  margin: 0;
+  background: var(--spv-bg);
+  color: var(--spv-ink);
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+/* Botões: o Bootstrap fixa as cores do .btn na compilação, por isso o override aqui */
+.btn-primary {
+  --bs-btn-bg: var(--spv-primary);
+  --bs-btn-border-color: var(--spv-primary);
+  --bs-btn-hover-bg: var(--spv-primary-hover);
+  --bs-btn-hover-border-color: var(--spv-primary-hover);
+  --bs-btn-active-bg: var(--spv-primary-hover);
+  --bs-btn-active-border-color: var(--spv-primary-hover);
+  --bs-btn-disabled-bg: var(--spv-primary);
+  --bs-btn-disabled-border-color: var(--spv-primary);
+  --bs-btn-focus-shadow-rgb: 61, 167, 253;
+  font-weight: 600;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--spv-primary);
+  --bs-btn-border-color: var(--spv-primary);
+  --bs-btn-hover-bg: var(--spv-primary);
+  --bs-btn-hover-border-color: var(--spv-primary);
+  --bs-btn-active-bg: var(--spv-primary-hover);
+  --bs-btn-active-border-color: var(--spv-primary-hover);
+  --bs-btn-focus-shadow-rgb: 61, 167, 253;
+}
+
+/* Emerald é claro: texto escuro por cima para manter a leitura */
+.btn-success {
+  --bs-btn-color: var(--spv-ink);
+  --bs-btn-bg: var(--spv-emerald);
+  --bs-btn-border-color: var(--spv-emerald);
+  --bs-btn-hover-color: var(--spv-ink);
+  --bs-btn-hover-bg: #05c393;
+  --bs-btn-hover-border-color: #05c393;
+  --bs-btn-active-color: var(--spv-ink);
+  --bs-btn-active-bg: #05b386;
+  --bs-btn-active-border-color: #05b386;
+  font-weight: 600;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--spv-sky);
+  box-shadow: 0 0 0 0.2rem var(--bs-focus-ring-color);
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--spv-muted);
+}
+
+.spv-avatar {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--spv-primary-soft);
+  color: var(--spv-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* Cartão padrão das telas (borda azul como no protótipo) */
+.spv-card {
+  background: var(--spv-surface);
+  border: 1px solid var(--spv-border);
+  border-radius: 0.75rem;
+}
+
+.spv-card-accent {
+  border-color: var(--spv-sky);
+}
+
+/* ---------- Ajustes de contraste ---------- */
+
+/* Emerald é claro: selos e fundos "success" usam texto escuro */
+.text-bg-success,
+.badge.bg-success {
+  color: var(--spv-ink) !important;
+}
+
+/* ---------- Tabelas e listas ---------- */
+
+.spv-tabela {
+  margin-bottom: 0;
+  font-size: 0.875rem;
+}
+
+.spv-tabela thead th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--spv-muted);
+  background: var(--spv-surface);
+  border-bottom-width: 1px;
+  white-space: nowrap;
+}
+
+.spv-tabela td {
+  vertical-align: middle;
+}
+
+.spv-card-header {
   display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--spv-border);
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
+.spv-card-header h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
   margin: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.spv-card-body {
+  padding: 1.1rem;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.spv-total {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.spv-dado-rotulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--spv-muted);
+  margin-bottom: 0.15rem;
+}
+
+/* ---------- Impressão (REQ008) ---------- */
+
+.spv-somente-impressao {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .spv-sidebar,
+  .spv-topbar,
+  .spv-nao-imprimir,
+  .toast-container {
+    display: none !important;
+  }
+
+  .spv-content {
+    padding: 0 !important;
+  }
+
+  .spv-somente-impressao {
+    display: block !important;
+  }
 }

@@ -1,0 +1,71 @@
+/* Linha do tempo das etapas do pedido (REQ040) */
+
+/* ---------- Linha do tempo do pedido ---------- */
+
+.spv-etapas {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.25rem;
+}
+
+.spv-etapa {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  font-size: 0.75rem;
+  color: var(--spv-muted);
+}
+
+.spv-etapa:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 0.9rem;
+  left: calc(50% + 1.1rem);
+  right: calc(-50% + 1.1rem);
+  height: 2px;
+  background: var(--spv-border);
+}
+
+.spv-etapa.feita:not(:last-child)::after {
+  background: var(--spv-emerald);
+}
+
+.spv-etapa-bolinha {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  border: 2px solid var(--spv-border);
+  background: var(--spv-surface);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.spv-etapa.feita .spv-etapa-bolinha {
+  background: var(--spv-emerald);
+  border-color: var(--spv-emerald);
+  color: var(--spv-ink);
+}
+
+.spv-etapa.atual .spv-etapa-bolinha {
+  border-color: var(--spv-sky);
+  color: var(--spv-primary);
+  box-shadow: 0 0 0 4px var(--bs-focus-ring-color);
+}
+
+.spv-etapa.atual {
+  color: var(--spv-ink);
+  font-weight: 700;
+}
+
+@media (max-width: 575.98px) {
+  .spv-etapa-nome {
+    font-size: 0.65rem;
+  }
+}
