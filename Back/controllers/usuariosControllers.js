@@ -38,7 +38,10 @@ async function inserir(req,res){
             nome:req.body.nome,
             status:req.body.status
         });
-        res.status(201).json(usuario);
+        // nunca devolve o hash da senha
+        const dados = usuario.toJSON();
+        delete dados.senha;
+        res.status(201).json(dados);
     }catch(erro){
         res.status(500).json({erro:erro.message});
     }
@@ -61,9 +64,41 @@ async function atualizar(req,res){
 
         await usuario.update(dados);
 
-        res.json(usuario);
+        // nunca devolve o hash da senha
+        const resposta = usuario.toJSON();
+        delete resposta.senha;
+        res.json(resposta);
     }catch(erro){
         res.status(500).json({erro:erro.message});
+    }
+}
+
+// PUT /usuarios/:id/senha - o próprio usuário troca a senha (tela "Meu usuário")
+// Recebe { senhaAtual, novaSenha } e só troca se a senha atual estiver certa
+async function alterarSenha(req,res){
+    try{
+        const { senhaAtual, novaSenha } = req.body || {};
+
+        if(!senhaAtual || !novaSenha){
+            return res.status(400).json({ erro:'Informe a senha atual e a nova senha.' });
+        }
+        if(String(novaSenha).length < 6){
+            return res.status(400).json({ erro:'A nova senha precisa ter pelo menos 6 caracteres.' });
+        }
+
+        const usuario = await Usuario.findByPk(req.params.id);
+        if(!usuario){
+            return res.status(404).json({ erro:'Usuário não encontrado.' });
+        }
+        if(usuario.senha !== gerarHashMD5(String(senhaAtual))){
+            return res.status(400).json({ erro:'A senha atual está incorreta.' });
+        }
+
+        await usuario.update({ senha:gerarHashMD5(String(novaSenha)) });
+
+        res.json({ mensagem:'Senha alterada com sucesso.' });
+    }catch(erro){
+        res.status(500).json({ erro:erro.message });
     }
 }
 
@@ -82,5 +117,6 @@ module.exports = {
     buscar,
     inserir,
     atualizar,
+    alterarSenha,
     excluir
 };

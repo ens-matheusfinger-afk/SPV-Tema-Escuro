@@ -13,6 +13,8 @@ const clientesCNPJRoutes = require('./routes/clientesCNPJRoutes');
 const contasPagarRoutes = require('./routes/contasPagarRoutes');
 const contasReceberRoutes = require('./routes/contasReceberRoutes');
 const movimentacoesRoutes = require('./routes/movimentacoesRoutes');
+const usuarioTelaRoutes = require('./routes/usuarioTelaRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -35,6 +37,8 @@ app.use('/clientes-cnpj', clientesCNPJRoutes);
 app.use('/contas-pagar', contasPagarRoutes);
 app.use('/contas-receber', contasReceberRoutes);
 app.use('/movimentacoes', movimentacoesRoutes);
+app.use('/usuario-tela', usuarioTelaRoutes); // permissões por tela (REQ002)
+app.use('/login', authRoutes);               // autenticação (REQ003)
 
 sequelize
   .authenticate()

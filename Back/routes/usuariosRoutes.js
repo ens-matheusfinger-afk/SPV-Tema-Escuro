@@ -6,6 +6,7 @@ router.get('/',controller.listar);
 router.get('/:id',controller.buscar);
 router.post('/',controller.inserir);
 router.put('/:id',controller.atualizar);
+router.put('/:id/senha',controller.alterarSenha);
 router.delete('/:id',controller.excluir);
 
 module.exports = router;

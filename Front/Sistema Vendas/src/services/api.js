@@ -4,12 +4,15 @@ import { fakeBackend } from '../mocks/fakeBackend'
 /*
  * Instância única de acesso ao Back. Todo service usa esta instância.
  *
- * Modo de teste (padrão): as requisições são respondidas pelo mock em src/mocks/fakeBackend.js,
- * que imita as rotas reais. Para usar o Back de verdade, crie o arquivo .env.local com:
- *   VITE_USE_MOCK=false
- * e reinicie o "npm run dev". Em dev, "/api" é redirecionado para http://localhost:3000.
+ * Padrão: usa o Back de verdade (Express + PostgreSQL). Em dev, "/api" é redirecionado
+ * pelo Vite para http://localhost:3000 — o Back precisa estar rodando.
+ *
+ * Modo de teste (sem Back): crie o arquivo .env.local com
+ *   VITE_USE_MOCK=true
+ * e reinicie o "npm run dev". As requisições passam a ser respondidas pelo mock em
+ * src/mocks/fakeBackend.js, que imita as rotas reais com dados de exemplo.
  */
-export const USANDO_MOCK = import.meta.env.VITE_USE_MOCK !== 'false'
+export const USANDO_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
