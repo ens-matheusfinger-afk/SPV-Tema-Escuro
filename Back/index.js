@@ -15,11 +15,18 @@ const contasReceberRoutes = require('./routes/contasReceberRoutes');
 const movimentacoesRoutes = require('./routes/movimentacoesRoutes');
 const usuarioTelaRoutes = require('./routes/usuarioTelaRoutes');
 const authRoutes = require('./routes/authRoutes');
+const anexosRoutes = require('./routes/anexosRoutes');
+const apontamentosRoutes = require('./routes/apontamentosRoutes');
+const pendenciasRoutes = require('./routes/pendenciasRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const logsRoutes = require('./routes/logsRoutes');
+const { auditoria } = require('./utils/logs');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(auditoria); // SPV-111: registra em logs as operações que alteram dados (REQ028)
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -39,6 +46,11 @@ app.use('/contas-receber', contasReceberRoutes);
 app.use('/movimentacoes', movimentacoesRoutes);
 app.use('/usuario-tela', usuarioTelaRoutes); // permissões por tela (REQ002)
 app.use('/login', authRoutes);               // autenticação (REQ003)
+app.use('/anexos', anexosRoutes.avulso);     // arquivos dos pedidos (SPV-91)
+app.use('/apontamentos', apontamentosRoutes.avulso); // produção / M.E.S. (SPV-93/94/95)
+app.use('/pendencias', pendenciasRoutes);           // pendências por cliente - VIEW (SPV-58)
+app.use('/dashboard', dashboardRoutes);             // dashboard gerencial (SPV-101)
+app.use('/logs', logsRoutes);                       // registro de logs (SPV-111)
 
 sequelize
   .authenticate()

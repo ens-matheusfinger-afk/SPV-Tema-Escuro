@@ -1,5 +1,10 @@
 const Estoque = require('../models/estoqueModels');
 const Produtos = require('../models/produtosModels');
+const Usuario = require('../models/usuariosModels');
+const MovimentacoesEstoque = require('../models/movimentacoesEstoqueModels');
+
+const QUANTIDADE_MAXIMA = 999999;
+const inteiroPositivo = (n) => Number.isInteger(n) && n > 0 && n <= QUANTIDADE_MAXIMA;
 
 // POST /estoque - cadastra o controle de estoque de um produto (REQ017)
 // Diagrama de Classes chama este método de "adiciona()"
@@ -29,10 +34,20 @@ exports.cadastrar = async (req, res) => {
 
     const estoque = await Estoque.create({
       idProduto,
-      estoqueAtual: estoqueAtual ?? 0,
+      estoqueAtual: 0,
       estoqueMinimo: estoqueMinimo ?? 0,
       estoqueMaximo: estoqueMaximo ?? null,
     });
+
+    // O saldo inicial entra pelo histórico, como uma entrada de mercadoria
+    const inicial = Number(estoqueAtual) || 0;
+    if (inicial > 0) {
+      await MovimentacoesEstoque.movimentar(estoque, inicial, {
+        tipo: 'entrada',
+        motivo: 'Saldo inicial',
+        idUsuario: req.body.idUsuario ?? null,
+      });
+    }
 
     return res.status(201).json(estoque);
   } catch (error) {
@@ -106,8 +121,8 @@ exports.entrada = async (req, res) => {
     const { id } = req.params;
     const { quantidade } = req.body;
 
-    if (!quantidade || quantidade <= 0) {
-      return res.status(400).json({ erro: 'Informe uma quantidade de entrada maior que zero.' });
+    if (!inteiroPositivo(quantidade)) {
+      return res.status(400).json({ erro: 'Informe uma quantidade de entrada inteira e maior que zero.' });
     }
 
     const estoque = await Estoque.findByPk(id);
@@ -115,8 +130,11 @@ exports.entrada = async (req, res) => {
       return res.status(404).json({ erro: 'Registro de estoque não encontrado.' });
     }
 
-    estoque.estoqueAtual += quantidade;
-    await estoque.save();
+    await MovimentacoesEstoque.movimentar(estoque, quantidade, {
+      tipo: 'entrada',
+      motivo: req.body.motivo?.trim() || 'Entrada de mercadoria',
+      idUsuario: req.body.idUsuario ?? null,
+    });
 
     return res.status(200).json(estoque);
   } catch (error) {
@@ -131,8 +149,8 @@ exports.saida = async (req, res) => {
     const { id } = req.params;
     const { quantidade } = req.body;
 
-    if (!quantidade || quantidade <= 0) {
-      return res.status(400).json({ erro: 'Informe uma quantidade de saída maior que zero.' });
+    if (!inteiroPositivo(quantidade)) {
+      return res.status(400).json({ erro: 'Informe uma quantidade de saída inteira e maior que zero.' });
     }
 
     const estoque = await Estoque.findByPk(id);
@@ -147,8 +165,11 @@ exports.saida = async (req, res) => {
       });
     }
 
-    estoque.estoqueAtual -= quantidade;
-    await estoque.save();
+    await MovimentacoesEstoque.movimentar(estoque, -quantidade, {
+      tipo: 'saida',
+      motivo: req.body.motivo?.trim() || 'Saída manual',
+      idUsuario: req.body.idUsuario ?? null,
+    });
 
     return res.status(200).json(estoque);
   } catch (error) {
@@ -172,5 +193,59 @@ exports.deletar = async (req, res) => {
     return res.status(200).json({ mensagem: 'Registro de estoque removido com sucesso.' });
   } catch (error) {
     return res.status(500).json({ erro: 'Erro ao remover estoque.', detalhes: error.message });
+  }
+};
+
+// POST /estoque/:id/ajuste - SPV-109: ajuste manual pela contagem física (inventário)
+// body: { novoSaldo, motivo, idUsuario }. Grava a diferença no histórico como "ajuste".
+exports.ajuste = async (req, res) => {
+  try {
+    const novoSaldo = Number(req.body.novoSaldo);
+    const motivo = req.body.motivo?.trim();
+
+    if (!Number.isInteger(novoSaldo) || novoSaldo < 0 || novoSaldo > QUANTIDADE_MAXIMA) {
+      return res.status(400).json({ erro: 'Informe o saldo contado (número inteiro, 0 ou mais).' });
+    }
+    if (!motivo) {
+      return res.status(400).json({ erro: 'Informe o motivo do ajuste (ex.: contagem do inventário).' });
+    }
+
+    const estoque = await Estoque.findByPk(req.params.id);
+    if (!estoque) {
+      return res.status(404).json({ erro: 'Registro de estoque não encontrado.' });
+    }
+    if (novoSaldo === estoque.estoqueAtual) {
+      return res.status(400).json({ erro: 'O saldo contado é igual ao saldo atual: não há o que ajustar.' });
+    }
+
+    await MovimentacoesEstoque.movimentar(estoque, novoSaldo - estoque.estoqueAtual, {
+      tipo: 'ajuste',
+      motivo,
+      idUsuario: req.body.idUsuario ?? null,
+    });
+
+    return res.status(200).json(estoque);
+  } catch (error) {
+    return res.status(500).json({ erro: 'Erro ao ajustar estoque.', detalhes: error.message });
+  }
+};
+
+// GET /estoque/:id/movimentacoes - histórico do produto (mais recentes primeiro, até 200)
+exports.movimentacoes = async (req, res) => {
+  try {
+    const estoque = await Estoque.findByPk(req.params.id);
+    if (!estoque) {
+      return res.status(404).json({ erro: 'Registro de estoque não encontrado.' });
+    }
+
+    const lista = await MovimentacoesEstoque.findAll({
+      where: { idProduto: estoque.idProduto },
+      include: [{ model: Usuario, as: 'usuario', attributes: ['id', 'nome'] }],
+      order: [['data', 'DESC'], ['id', 'DESC']],
+      limit: 200,
+    });
+    return res.status(200).json(lista);
+  } catch (error) {
+    return res.status(500).json({ erro: 'Erro ao listar movimentações.', detalhes: error.message });
   }
 };

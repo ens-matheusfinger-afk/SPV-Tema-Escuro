@@ -1,0 +1,22 @@
+/* Estrelas do fator de confiança (SPV-119) */
+.spv-confianca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.spv-confianca .bi {
+  margin-right: 1px;
+}
+
+/* "Normal" e "Boa" em cinza/azul ficam fortes demais: suaviza as estrelas vazias */
+.spv-confianca .bi-star {
+  opacity: 0.45;
+}
+
+.spv-confianca-nome {
+  color: var(--spv-muted);
+  font-weight: 600;
+}

@@ -1,0 +1,62 @@
+/* Lista de anexos do pedido (SPV-91) */
+.spv-anexos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.spv-anexo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.spv-anexo-previa {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 0.4rem;
+  border: 1px solid var(--spv-border);
+  background: var(--spv-primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--spv-primary);
+  font-size: 1.3rem;
+}
+
+.spv-anexo-previa img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spv-anexo-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.spv-anexo-nome {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spv-anexo-meta {
+  font-size: 0.72rem;
+  color: var(--spv-muted);
+}
+
+.spv-anexo-acoes {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 0.25rem;
+}

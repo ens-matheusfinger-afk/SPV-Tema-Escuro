@@ -1,0 +1,60 @@
+/* Tela de Estoque (SPV-65/108/109) */
+
+.spv-estoque-resumo {
+  height: 100%;
+  padding: 0.9rem 1rem;
+  background: var(--spv-surface);
+  border: 1px solid var(--spv-border);
+  border-left: 4px solid var(--cor, var(--spv-sky));
+  border-radius: 0.6rem;
+}
+
+.spv-estoque-resumo-rotulo {
+  font-size: 0.8rem;
+  color: var(--spv-muted);
+}
+
+.spv-estoque-resumo-valor {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--spv-ink);
+}
+
+.spv-estoque-resumo-detalhe {
+  font-size: 0.78rem;
+  color: var(--spv-muted);
+}
+
+/* Barra de ocupação (saldo / máximo), com marquinha no estoque mínimo */
+.spv-ocupacao {
+  --cor-ocupacao: var(--spv-emerald);
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--spv-border);
+}
+
+.spv-ocupacao > span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--cor-ocupacao);
+}
+
+.spv-ocupacao > i {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 12px;
+  background: var(--spv-ink);
+  opacity: 0.55;
+}
+
+.spv-ocupacao-baixo {
+  --cor-ocupacao: #f5b400;
+}
+
+.spv-ocupacao-zerado {
+  --cor-ocupacao: var(--bs-danger);
+}

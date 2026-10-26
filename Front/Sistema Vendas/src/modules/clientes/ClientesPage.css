@@ -1,0 +1,15 @@
+/* Tela de clientes */
+
+/* Cliente inativo fica apagado na lista */
+.spv-cliente-inativo td {
+  color: var(--spv-muted);
+}
+
+/* Observação (SPV-119): uma linha, o texto inteiro aparece ao passar o mouse */
+.spv-cliente-obs {
+  max-width: 380px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #8a6100;
+}

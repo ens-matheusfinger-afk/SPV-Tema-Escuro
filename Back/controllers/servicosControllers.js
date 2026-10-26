@@ -1,4 +1,5 @@
 const Servicos = require('../models/servicosModels');
+const ItensPedido = require('../models/itensPedidoModels');
 
 // POST /servicos - REQ006: Cadastro de Serviços
 exports.cadastra = async (req, res) => {
@@ -78,6 +79,14 @@ exports.deleta = async (req, res) => {
 
     if (!servico) {
       return res.status(404).json({ erro: 'Serviço não encontrado.' });
+    }
+
+    // Não exclui o que já foi vendido: o pedido perderia a referência do item
+    const usadoEmPedidos = await ItensPedido.count({ where: { idServico: id } });
+    if (usadoEmPedidos > 0) {
+      return res.status(409).json({
+        erro: `Este serviço já foi usado em ${usadoEmPedidos} item(ns) de pedido e não pode ser excluído. Você pode editar o nome ou o valor.`,
+      });
     }
 
     await servico.destroy();

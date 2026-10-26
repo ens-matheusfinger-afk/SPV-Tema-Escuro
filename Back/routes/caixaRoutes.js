@@ -2,14 +2,13 @@ const express = require('express');
 const router = express.Router();
 const caixaControllers = require('../controllers/caixaControllers');
 
-router.post('/', caixaControllers.cadastrar);
-router.get('/', caixaControllers.listar);
-
-// Precisa vir ANTES de "/:id", senão o Express entende "fechamento" como um :id
-router.get('/fechamento', caixaControllers.fechamentoDiario);
-
-router.get('/:id', caixaControllers.buscarPorId);
-router.put('/:id', caixaControllers.editar);
-router.delete('/:id', caixaControllers.deletar);
+// REQ013 — SPV-84 (fechamento) / SPV-97 (entradas por forma de pagamento)
+router.get('/', caixaControllers.doDia); // ?data=AAAA-MM-DD
+router.get('/periodo', caixaControllers.periodo); // ?de=&ate=
+router.get('/fluxo', caixaControllers.fluxo); // ?de=&ate= - SPV-81 relatório de fluxo de caixa
+router.get('/fechamentos', caixaControllers.fechamentos);
+router.post('/', caixaControllers.lancar);
+router.post('/fechar', caixaControllers.fechar);
+router.delete('/:id', caixaControllers.excluir);
 
 module.exports = router;

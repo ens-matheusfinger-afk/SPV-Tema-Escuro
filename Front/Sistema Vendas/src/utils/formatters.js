@@ -42,7 +42,7 @@ export function estaAtrasado(dataPrevista) {
   return Boolean(dataPrevista) && diaParaInput(dataPrevista) < hojeISO()
 }
 
-// "Maria Paula Medeiros" -> "MP"
+// "Matheus Dalanhol Finger" -> "MD"
 export function iniciais(nome = '') {
   return nome
     .trim()
@@ -69,4 +69,48 @@ export function formatarTelefone(tel = '') {
 // Busca sem diferenciar maiúsculas e acentos: "joao" encontra "João"
 export function normalizarBusca(texto = '') {
   return String(texto).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim()
+}
+
+// Duração em minutos -> "45 min", "1h", "1h 30min"
+export function formatarDuracao(minutos) {
+  if (minutos === null || minutos === undefined || minutos === '') return '—'
+  const total = Number(minutos)
+  if (!Number.isFinite(total) || total < 0) return '—'
+  const h = Math.floor(total / 60)
+  const m = total % 60
+  if (h === 0) return `${m} min`
+  return m === 0 ? `${h}h` : `${h}h ${m}min`
+}
+
+// Tamanho de arquivo em bytes -> "850 KB", "2,4 MB"
+export function formatarTamanho(bytes) {
+  const n = Number(bytes) || 0
+  if (n < 1024) return `${n} B`
+  if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`
+  return `${(n / (1024 * 1024)).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`
+}
+
+// Máscaras aplicadas enquanto o usuário digita (aceitam número incompleto)
+function aplicarMascara(digitos, mascara) {
+  let i = 0
+  let saida = ''
+  for (const c of mascara) {
+    if (i >= digitos.length) break
+    saida += c === '#' ? digitos[i++] : c
+  }
+  return saida
+}
+
+export function mascaraDocumento(tipo, texto) {
+  const n = String(texto ?? '').replace(/\D/g, '')
+  return tipo === 'PJ'
+    ? aplicarMascara(n.slice(0, 14), '##.###.###/####-##')
+    : aplicarMascara(n.slice(0, 11), '###.###.###-##')
+}
+
+export function mascaraTelefone(texto) {
+  const n = String(texto ?? '')
+    .replace(/\D/g, '')
+    .slice(0, 11)
+  return aplicarMascara(n, n.length > 10 ? '(##) #####-####' : '(##) ####-####')
 }

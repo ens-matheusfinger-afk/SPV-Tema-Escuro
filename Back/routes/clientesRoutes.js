@@ -3,6 +3,7 @@ const router = express.Router();
 const controller = require('../controllers/clientesControllers');
 
 router.get('/',controller.listar);
+router.get('/inadimplentes',controller.inadimplentes); // antes de '/:id'
 router.get('/:id',controller.buscar);
 router.post('/',controller.inserir);
 router.put('/:id',controller.atualizar);

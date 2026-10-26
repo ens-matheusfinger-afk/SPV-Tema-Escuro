@@ -20,6 +20,19 @@ const api = axios.create({
   ...(USANDO_MOCK ? { adapter: fakeBackend } : {}),
 })
 
+// SPV-111: manda quem está logado em toda requisição, para o Back gravar no registro de logs
+api.interceptors.request.use((config) => {
+  try {
+    const sessao = JSON.parse(sessionStorage.getItem('spv:sessao') || 'null')
+    if (sessao?.id && !config.headers.has?.('X-Usuario-Id')) {
+      config.headers.set('X-Usuario-Id', String(sessao.id))
+    }
+  } catch {
+    // sem sessão (tela de login): segue sem o cabeçalho
+  }
+  return config
+})
+
 // Converte qualquer erro de requisição em uma frase para mostrar ao usuário (REQ039)
 export function mensagemDeErro(
   erro,

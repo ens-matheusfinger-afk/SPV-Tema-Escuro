@@ -1,4 +1,11 @@
 const { Sequelize } = require('sequelize');
+const pg = require('pg');
+
+// Colunas TIMESTAMP (sem fuso) guardam a hora em UTC: o Sequelize conecta com fuso +00:00
+// e grava assim. Sem esta linha, o driver do PostgreSQL lê a hora como se fosse do fuso do
+// computador (Brasília) e as horas aparecem 3h adiantadas na tela (ex.: início da produção).
+const TIMESTAMP_SEM_FUSO = 1114;
+pg.types.setTypeParser(TIMESTAMP_SEM_FUSO, (valor) => new Date(`${valor.replace(' ', 'T')}Z`));
 
 // Dados de conexão: lidos do arquivo Back/.env (veja Back/.env.example).
 // Sem o .env, usa os valores padrão abaixo (os mesmos de antes).

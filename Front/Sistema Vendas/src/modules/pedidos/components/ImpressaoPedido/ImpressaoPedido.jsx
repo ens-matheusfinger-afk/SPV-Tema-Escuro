@@ -10,12 +10,12 @@ import './ImpressaoPedido.css'
 
 /*
  * Versão para imprimir (REQ008). Só aparece na impressão (classe spv-somente-impressao).
- * modo "a4": folha completa do pedido | modo "etiqueta": etiqueta 100 x 70 mm para identificar o pacote
+ * modo "a4": folha completa do pedido | modo "etiqueta": etiqueta 100 x 100 mm para identificar o pacote (SPV-69)
  */
 export default function ImpressaoPedido({ pedido, cliente, modo }) {
   const pagina =
     modo === 'etiqueta'
-      ? '@page { size: 100mm 70mm; margin: 3mm; }'
+      ? '@page { size: 100mm 100mm; margin: 3mm; }'
       : '@page { size: A4; margin: 15mm; }'
 
   return (
@@ -30,33 +30,46 @@ export default function ImpressaoPedido({ pedido, cliente, modo }) {
   )
 }
 
+// Quantos itens cabem listados na etiqueta 100 x 100 (o resto vira "+ N item(ns)")
+const ITENS_NA_ETIQUETA = 5
+
 function Etiqueta({ pedido, cliente }) {
   const unidades = pedido.itens.reduce((s, i) => s + i.quantidade, 0)
+  const listados = pedido.itens.slice(0, ITENS_NA_ETIQUETA)
+  const restantes = pedido.itens.length - listados.length
+
   return (
     <div className="spv-etiqueta">
       <div className="d-flex justify-content-between align-items-start">
         <div>
-          <div style={{ fontSize: '8pt', fontWeight: 700 }}>SYS VENDAS · PEDIDO</div>
+          <div className="spv-etiqueta-marca">SYS VENDAS · PEDIDO</div>
           <div className="spv-etiqueta-numero">#{pedido.id}</div>
         </div>
-        <div className="text-end" style={{ fontSize: '9pt' }}>
-          <div>Entrega</div>
-          <strong style={{ fontSize: '12pt' }}>{formatarDia(pedido.dataEntregaPrevista)}</strong>
+        <div className="text-end">
+          <div className="spv-etiqueta-marca">ENTREGA</div>
+          <div className="spv-etiqueta-entrega">{formatarDia(pedido.dataEntregaPrevista)}</div>
         </div>
       </div>
-      <hr className="my-2" style={{ borderColor: '#000', opacity: 1 }} />
-      <div style={{ fontSize: '12pt', fontWeight: 700 }}>
-        {cliente?.nome ?? `Cliente ${pedido.idCliente}`}
+
+      <div className="spv-etiqueta-bloco">
+        <div className="spv-etiqueta-cliente">{cliente?.nome ?? `Cliente ${pedido.idCliente}`}</div>
+        {cliente?.telefone && <div>{formatarTelefone(cliente.telefone)}</div>}
       </div>
-      {cliente?.telefone && <div>{formatarTelefone(cliente.telefone)}</div>}
-      <div className="mt-1">
-        {pedido.itens.length} item(ns) · {unidades} unidade(s)
-      </div>
-      {pedido.descricao && (
-        <div className="text-truncate" style={{ fontSize: '9pt' }}>
-          {pedido.descricao}
+
+      <div className="spv-etiqueta-bloco spv-etiqueta-itens">
+        <div className="spv-etiqueta-marca mb-1">
+          {pedido.itens.length} ITEM(NS) · {unidades} UNIDADE(S)
         </div>
-      )}
+        {listados.map((i) => (
+          <div key={i.id} className="d-flex justify-content-between gap-2">
+            <span className="text-truncate">{i.nome}</span>
+            <strong>{i.quantidade}x</strong>
+          </div>
+        ))}
+        {restantes > 0 && <div className="fst-italic">+ {restantes} item(ns)</div>}
+      </div>
+
+      {pedido.descricao && <div className="spv-etiqueta-obs">{pedido.descricao}</div>}
     </div>
   )
 }
@@ -128,6 +141,25 @@ function FolhaA4({ pedido, cliente }) {
           ))}
         </tbody>
         <tfoot>
+          {pedido.desconto && (
+            <>
+              <tr>
+                <td colSpan={4} style={{ textAlign: 'right' }}>
+                  Subtotal
+                </td>
+                <td style={{ textAlign: 'right' }}>{formatarMoeda(pedido.subtotal)}</td>
+              </tr>
+              <tr>
+                <td colSpan={4} style={{ textAlign: 'right' }}>
+                  Desconto
+                  {pedido.desconto.tipo === 'percentual'
+                    ? ` (${String(pedido.desconto.informado).replace('.', ',')}%)`
+                    : ''}
+                </td>
+                <td style={{ textAlign: 'right' }}>− {formatarMoeda(pedido.desconto.valor)}</td>
+              </tr>
+            </>
+          )}
           <tr>
             <th colSpan={4} style={{ textAlign: 'right' }}>
               Total

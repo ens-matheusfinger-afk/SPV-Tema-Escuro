@@ -2,6 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Usuario = require('./usuariosModels');
 const Pedidos = require('./pedidosModels');
+const ContasPagar = require('./contasPagarModels');
 
 // REQ013 - Módulo de Fechamento de Caixa
 // Cada linha é 1 lançamento (entrada ou saída) do dia - não 1 registro por dia.
@@ -28,14 +29,14 @@ const Caixa = sequelize.define(
         isIn: { args: [['entrada', 'saida']], msg: "tipo deve ser 'entrada' ou 'saida'." },
       },
     },
-    // obrigatória para entradas; opcional para saídas (validado no controller)
+    // obrigatória para entradas; boleto/transferência só aparecem em saídas (pagamento de contas)
     formaPagamento: {
-      type: DataTypes.STRING(10),
+      type: DataTypes.STRING(20),
       allowNull: true,
       validate: {
         isIn: {
-          args: [['dinheiro', 'pix', 'cartao']],
-          msg: "formaPagamento deve ser 'dinheiro', 'pix' ou 'cartao'.",
+          args: [['dinheiro', 'pix', 'cartao', 'boleto', 'transferencia']],
+          msg: 'Forma de pagamento inválida.',
         },
       },
     },
@@ -61,6 +62,15 @@ const Caixa = sequelize.define(
       allowNull: false,
       references: { model: Usuario, key: 'id' },
     },
+    // SPV-97: de qual conta veio o lançamento (recebimento de conta a receber / pagamento de conta a pagar)
+    idContaReceber: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    idContaPagar: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
   {
     tableName: 'caixa',
@@ -71,5 +81,7 @@ const Caixa = sequelize.define(
 
 Caixa.belongsTo(Usuario, { foreignKey: 'idUsuario', as: 'usuario' });
 Caixa.belongsTo(Pedidos, { foreignKey: 'idPedido', as: 'pedido' });
+// SPV-81: categoria da despesa no fluxo de caixa (pagamento de conta a pagar)
+Caixa.belongsTo(ContasPagar, { foreignKey: 'idContaPagar', as: 'contaPagar', constraints: false });
 
 module.exports = Caixa;

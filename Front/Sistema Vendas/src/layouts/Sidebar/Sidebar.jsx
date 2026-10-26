@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Collapse, Offcanvas } from 'react-bootstrap'
 import { useAuth } from '../../hooks/useAuth'
+import { useAlertasEstoque } from '../../hooks/useAlertasEstoque'
+import { useAlertasContasPagar } from '../../hooks/useAlertasContasPagar'
 import { MENU } from '../../routes/rotas'
+import { TELAS } from '../../utils/constants'
 import { iniciais } from '../../utils/formatters'
 import Logo from '../../components/Logo/Logo'
 import './Sidebar.css'
@@ -11,6 +14,31 @@ import './Sidebar.css'
 export default function Sidebar({ aberto, aoFechar }) {
   const { usuario, podeAcessar, logout } = useAuth()
   const { pathname } = useLocation()
+  // SPV-108: número de produtos no estoque mínimo ao lado de "Estoque"
+  const alertasEstoque = useAlertasEstoque(podeAcessar(TELAS.ESTOQUE), pathname)
+  // SPV-98: contas a pagar vencidas ou vencendo em até 3 dias ao lado de "Contas a pagar"
+  const alertasPagar = useAlertasContasPagar(podeAcessar(TELAS.CONTAS_PAGAR), pathname)
+  const avisos = {
+    '/estoque': {
+      n: alertasEstoque,
+      titulo: 'produto(s) no estoque mínimo ou abaixo',
+      cor: 'warning',
+    },
+    '/financeiro/contas-pagar': {
+      n: alertasPagar,
+      titulo: 'conta(s) a pagar vencida(s) ou vencendo em até 3 dias',
+      cor: 'danger',
+    },
+  }
+  const selo = (aviso) =>
+    aviso?.n > 0 && (
+      <span
+        className={`badge rounded-pill text-bg-${aviso.cor} ms-auto`}
+        title={`${aviso.n} ${aviso.titulo}`}
+      >
+        {aviso.n}
+      </span>
+    )
 
   // Só mostra o que o usuário pode acessar; grupo sem nenhum item liberado some
   const menu = MENU.map((item) =>
@@ -39,6 +67,7 @@ export default function Sidebar({ aberto, aoFechar }) {
     >
       <i className={`bi ${item.icone}`} aria-hidden="true"></i>
       {item.label}
+      {selo(avisos[item.path])}
     </NavLink>
   )
 
@@ -76,6 +105,9 @@ export default function Sidebar({ aberto, aoFechar }) {
                 >
                   <i className={`bi ${item.icone}`} aria-hidden="true"></i>
                   {item.label}
+                  {/* grupo fechado: mostra o aviso dos itens de dentro */}
+                  {!aberto &&
+                    item.itens.map((sub) => <span key={sub.path}>{selo(avisos[sub.path])}</span>)}
                   <i className="bi bi-chevron-down spv-chevron" aria-hidden="true"></i>
                 </button>
                 <Collapse in={aberto}>

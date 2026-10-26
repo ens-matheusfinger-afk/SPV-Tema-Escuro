@@ -11,7 +11,8 @@ const ContasPagar = sequelize.define('ContasPagar', {
 
     item: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        defaultValue: 1
     },
 
     tipo: {
@@ -38,6 +39,22 @@ const ContasPagar = sequelize.define('ContasPagar', {
     valor: {
         type: DataTypes.DECIMAL(10,2),
         allowNull: false
+    },
+
+    // SPV-86/98/99 — fornecedor, vencimento e como foi paga
+    fornecedor: {
+        type: DataTypes.STRING(150),
+        allowNull: true
+    },
+
+    dataVencimento: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+    },
+
+    formaPagamento: {
+        type: DataTypes.STRING(20),
+        allowNull: true
     }
 
 },
@@ -46,27 +63,9 @@ const ContasPagar = sequelize.define('ContasPagar', {
     timestamps: false
 });
 
-ContasPagar.criarPendencia = async function(dados){
-    const { item, tipo, descricao, dataPagamento, dataCriacao, valor } = dados;
-    const registro = await ContasPagar.create({ item, tipo, descricao, dataPagamento, dataCriacao, valor });
-    return registro.id;
-};
-
-ContasPagar.editarPendencia = async function(id, dados){
-    const { item, tipo, descricao, dataPagamento, dataCriacao, valor } = dados;
-    const registro = await ContasPagar.findByPk(id);
-    if(!registro) throw new Error('Pendência não encontrada.');
-    await registro.update({ item, tipo, descricao, dataPagamento, dataCriacao, valor });
-};
-
-ContasPagar.excluirPendencia = async function(id){
-    const registro = await ContasPagar.findByPk(id);
-    if(!registro) throw new Error('Pendência não encontrada.');
-    await registro.destroy();
-};
-
 ContasPagar.listarTudo = async function(){
-    return await ContasPagar.findAll();
+    // vencimento mais próximo primeiro (contas sem vencimento vão para o fim)
+    return await ContasPagar.findAll({ order: [['dataVencimento', 'ASC NULLS LAST'], ['id', 'ASC']] });
 };
 
 module.exports = ContasPagar;

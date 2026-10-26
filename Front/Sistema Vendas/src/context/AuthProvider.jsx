@@ -3,7 +3,7 @@ import { AuthContext } from './AuthContext'
 import { useIdleTimeout } from '../hooks/useIdleTimeout'
 import { MINUTOS_INATIVIDADE } from '../utils/constants'
 import { nomeDoPerfil } from '../utils/permissoes'
-import { entrar } from '../services/authService'
+import { entrar, registrarSaida } from '../services/authService'
 import { buscarUsuario } from '../services/usuariosService'
 import { mensagemDeErro } from '../services/api'
 
@@ -47,6 +47,9 @@ export function AuthProvider({ children }) {
 
   // manual = true quando o usuário clicou em "Sair" (false = sessão expirou)
   const logout = useCallback((mensagem = '', manual = false) => {
+    // SPV-111: registra a saída (manual ou por inatividade) antes de apagar a sessão
+    const sessao = lerSessao()
+    if (sessao?.id) registrarSaida(sessao.id, manual || !mensagem ? 'manual' : 'inatividade')
     sessionStorage.removeItem(CHAVE_SESSAO)
     setUsuario(null)
     setAviso(mensagem)
@@ -62,7 +65,13 @@ export function AuthProvider({ children }) {
 
   // REQ002 — telas sem chave (ex.: "Meu usuário") ficam liberadas para todos os logados
   const podeAcessar = useCallback(
-    (tela) => (tela == null ? Boolean(usuario) : Boolean(usuario?.telas.includes(tela))),
+    // tela pode ser uma lista: libera se o usuário tiver QUALQUER uma delas
+    (tela) =>
+      tela == null
+        ? Boolean(usuario)
+        : Array.isArray(tela)
+          ? tela.some((t) => usuario?.telas.includes(t))
+          : Boolean(usuario?.telas.includes(tela)),
     [usuario],
   )
 

@@ -27,7 +27,22 @@ export function normalizarPedido(p) {
     dataEntregaRealizada: p.dataEntregaRealizada,
     status: Number(p.status),
     total: Number(p.total),
+    // SPV-73: total = subtotal (itens) - desconto
+    subtotal: Number(p.subtotal ?? 0) || Number(p.total),
+    desconto: p.descontoTipo
+      ? {
+          tipo: p.descontoTipo,
+          informado: Number(p.descontoInformado),
+          valor: Number(p.valorDesconto),
+          motivo: p.motivoDesconto ?? '',
+          por: p.descontoPor?.nome ?? (p.idDescontoPor ? `usuário ${p.idDescontoPor}` : ''),
+        }
+      : null,
     anexo: p.anexo || '',
+    // SPV-118: pedido aberto para cliente devendo, com liberação do financeiro
+    liberacao: p.motivoLiberacao
+      ? { motivo: p.motivoLiberacao, por: p.liberadoPor?.nome ?? `usuário ${p.idLiberadoPor}` }
+      : null,
     itens: p.itens ? p.itens.map(normalizarItem) : undefined,
   }
 }
@@ -56,6 +71,7 @@ export async function criarPedido({
   dataEntregaPrevista,
   anexo,
   itens,
+  liberacao, // SPV-118: { idUsuario, motivo } quando o cliente está devendo
 }) {
   const { data: pedido } = await api.post('/pedidos', {
     idCliente,
@@ -63,6 +79,7 @@ export async function criarPedido({
     descricao: descricao?.trim() || null,
     dataEntregaPrevista: dataEntregaPrevista || null,
     anexo: anexo?.trim() || null,
+    ...(liberacao ? { liberacao } : {}),
   })
 
   for (const item of itens) {
@@ -114,4 +131,10 @@ export async function alterarQuantidadeItem(idPedido, idItem, quantidade) {
 
 export async function removerItem(idPedido, idItem) {
   await api.delete(`/pedidos/${idPedido}/itens/${idItem}`)
+}
+
+// SPV-73 — aplica, troca ou tira (tipo null) o desconto do pedido
+export async function aplicarDesconto(id, { tipo, valor, motivo, idUsuario }) {
+  const { data } = await api.put(`/pedidos/${id}/desconto`, { tipo, valor, motivo, idUsuario })
+  return normalizarPedido(data)
 }

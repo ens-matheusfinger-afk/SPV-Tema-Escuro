@@ -9,11 +9,13 @@ import StatusBadge from '../../components/StatusBadge/StatusBadge'
 import ItensEditor from './components/ItensEditor/ItensEditor'
 import LinhaDoTempo from './components/LinhaDoTempo/LinhaDoTempo'
 import ImpressaoPedido from './components/ImpressaoPedido/ImpressaoPedido'
+import DescontoPedido from './components/DescontoPedido/DescontoPedido'
 import { useCarregar } from '../../hooks/useCarregar'
 import { useNotificacao } from '../../hooks/useNotificacao'
 import {
   adicionarItem,
   alterarQuantidadeItem,
+  aplicarDesconto,
   alterarStatusPedido,
   buscarPedido,
   cancelarPedido,
@@ -32,7 +34,14 @@ import {
   formatarTelefone,
   hojeISO,
 } from '../../utils/formatters'
-import { pedidoAtrasado } from './filtros'
+import PrazoPedido from './components/PrazoPedido/PrazoPedido'
+import AnexosPedido from './components/AnexosPedido/AnexosPedido'
+import ProducaoPedido from './components/ProducaoPedido/ProducaoPedido'
+import HistoricoConferencias from './components/HistoricoConferencias/HistoricoConferencias'
+import ConferirPedidoModal from '../conferencia/ConferirPedidoModal'
+import { registrarConferencia } from '../../services/conferenciaService'
+import { useAuth } from '../../hooks/useAuth'
+import { dataMaximaEntrega, erroDataEntrega } from '../../utils/validacoes'
 
 // Ações que mudam o pedido de forma importante e por isso pedem confirmação (REQ038)
 const PEDE_CONFIRMACAO = (de, para) => para === 5 || (de === 3 && para === 2)
@@ -41,6 +50,7 @@ const PEDE_CONFIRMACAO = (de, para) => para === 5 || (de === 3 && para === 2)
 export default function PedidoDetalhePage() {
   const { id } = useParams()
   const notificar = useNotificacao()
+  const { usuario } = useAuth()
 
   const { dados, carregando, erro, recarregar } = useCarregar(async () => {
     const [pedido, clientes, catalogo] = await Promise.all([
@@ -54,6 +64,7 @@ export default function PedidoDetalhePage() {
   const [confirmacao, setConfirmacao] = useState(null) // { titulo, texto, botao, variante, acao }
   const [mudandoStatus, setMudandoStatus] = useState(false)
   const [erroAcao, setErroAcao] = useState('')
+  const [conferindo, setConferindo] = useState(null) // SPV-96: 'aprovado' | 'devolvido'
   const [editando, setEditando] = useState(false)
   const [modoImpressao, setModoImpressao] = useState(null)
 
@@ -101,6 +112,11 @@ export default function PedidoDetalhePage() {
   }
 
   const clicarAcao = (acao) => {
+    // SPV-96: aprovar ou devolver passa pela conferência (fica registrado com motivo)
+    if (pedido.status === 3) {
+      setConferindo(acao.para === 4 ? 'aprovado' : 'devolvido')
+      return
+    }
     if (!PEDE_CONFIRMACAO(pedido.status, acao.para)) {
       mudarStatus(acao.para)
       return
@@ -186,11 +202,20 @@ export default function PedidoDetalhePage() {
               </Dropdown.Item>
               <Dropdown.Item onClick={() => setModoImpressao('etiqueta')}>
                 <i className="bi bi-tag me-2" aria-hidden="true"></i>
-                Etiqueta (100 x 70 mm)
+                Etiqueta (100 x 100 mm)
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </PageHeader>
+
+        {/* SPV-118: pedido aberto com o cliente devendo, liberado pelo financeiro */}
+        {pedido.liberacao && (
+          <Alert variant="warning" className="small py-2" data-testid="liberacao-pedido">
+            <i className="bi bi-unlock me-1" aria-hidden="true"></i>
+            Pedido liberado com o cliente devendo, por <strong>{pedido.liberacao.por}</strong>:{' '}
+            {pedido.liberacao.motivo}
+          </Alert>
+        )}
 
         {erroAcao && (
           <Alert variant="danger" dismissible onClose={() => setErroAcao('')}>
@@ -203,7 +228,7 @@ export default function PedidoDetalhePage() {
           <div className="spv-card-header">
             <h2>Situação</h2>
             <StatusBadge status={pedido.status} />
-            {pedidoAtrasado(pedido) && <span className="badge text-bg-danger">Atrasado</span>}
+            <PrazoPedido pedido={pedido} barra={false} />
           </div>
           <div className="spv-card-body">
             <LinhaDoTempo status={pedido.status} />
@@ -263,6 +288,17 @@ export default function PedidoDetalhePage() {
                 aoAdicionar={aoAdicionar}
                 aoAlterarQuantidade={aoAlterarQuantidade}
                 aoRemover={aoRemover}
+                rotuloTotal={pedido.desconto ? 'Subtotal dos itens' : 'Total dos itens'}
+              />
+              {/* SPV-73: desconto do pedido (até ser finalizado) */}
+              <DescontoPedido
+                pedido={pedido}
+                podeAlterar={STATUS_ABERTOS.includes(pedido.status) && pedido.subtotal > 0}
+                aoSalvar={async (dados) => {
+                  await aplicarDesconto(pedido.id, { ...dados, idUsuario: usuario.id })
+                  notificar(dados.tipo ? 'Desconto aplicado.' : 'Desconto retirado.')
+                  await atualizar()
+                }}
               />
             </section>
           </div>
@@ -287,6 +323,13 @@ export default function PedidoDetalhePage() {
                 )}
                 {cliente?.telefone && <div>{formatarTelefone(cliente.telefone)}</div>}
                 {cliente?.email && <div>{cliente.email}</div>}
+                <Link
+                  to={`/pedidos/cliente?id=${pedido.idCliente}`}
+                  className="d-inline-block mt-2"
+                >
+                  <i className="bi bi-person-lines-fill me-1" aria-hidden="true"></i>
+                  Ver todos os pedidos deste cliente
+                </Link>
               </div>
             </section>
 
@@ -321,10 +364,13 @@ export default function PedidoDetalhePage() {
                 ) : (
                   <dl className="mb-0 small">
                     <dt className="spv-dado-rotulo">Entrega prevista</dt>
-                    <dd>{formatarDia(pedido.dataEntregaPrevista)}</dd>
+                    <dd>
+                      <div>{formatarDia(pedido.dataEntregaPrevista)}</div>
+                      <PrazoPedido pedido={pedido} />
+                    </dd>
                     <dt className="spv-dado-rotulo">Descrição / observações</dt>
                     <dd style={{ whiteSpace: 'pre-wrap' }}>{pedido.descricao || '—'}</dd>
-                    <dt className="spv-dado-rotulo">Anexo</dt>
+                    <dt className="spv-dado-rotulo">Link externo</dt>
                     <dd className="mb-0">
                       {pedido.anexo ? (
                         <a href={pedido.anexo} target="_blank" rel="noreferrer">
@@ -339,11 +385,35 @@ export default function PedidoDetalhePage() {
                 )}
               </div>
             </section>
+
+            <HistoricoConferencias idPedido={pedido.id} atualizarEm={pedido.status} />
+            <AnexosPedido idPedido={pedido.id} somenteLeitura={pedido.status === 6} />
+            <ProducaoPedido idPedido={pedido.id} atualizarEm={pedido.status} />
           </div>
         </div>
       </div>
 
       {modoImpressao && <ImpressaoPedido pedido={pedido} cliente={cliente} modo={modoImpressao} />}
+
+      {conferindo && (
+        <ConferirPedidoModal
+          pedido={pedido}
+          cliente={cliente?.nome}
+          resultadoInicial={conferindo}
+          aoFechar={() => setConferindo(null)}
+          aoConfirmar={async ({ resultado, motivo }) => {
+            await registrarConferencia(pedido.id, { idUsuario: usuario.id, resultado, motivo })
+            notificar(
+              resultado === 'aprovado'
+                ? `Pedido nº ${pedido.id} aprovado na conferência.`
+                : `Pedido nº ${pedido.id} devolvido para retrabalho.`,
+              resultado === 'aprovado' ? 'success' : 'warning',
+            )
+            setConferindo(null)
+            await atualizar()
+          }}
+        />
+      )}
 
       <ConfirmModal
         aberto={Boolean(confirmacao)}
@@ -370,7 +440,8 @@ function EditarDados({ pedido, aoSalvar, aoCancelar }) {
   const [erro, setErro] = useState('')
 
   const hoje = hojeISO()
-  const dataInvalida = !valores.dataEntregaPrevista || valores.dataEntregaPrevista < hoje
+  const erroData = erroDataEntrega(valores.dataEntregaPrevista, hoje)
+  const dataInvalida = Boolean(erroData)
   const anexoInvalido = Boolean(valores.anexo) && !/^https?:\/\/\S+$/i.test(valores.anexo.trim())
 
   const salvar = async (e) => {
@@ -393,13 +464,12 @@ function EditarDados({ pedido, aoSalvar, aoCancelar }) {
         <Form.Control
           type="date"
           min={hoje}
+          max={dataMaximaEntrega(hoje)}
           value={valores.dataEntregaPrevista}
           isInvalid={dataInvalida}
           onChange={(e) => setValores({ ...valores, dataEntregaPrevista: e.target.value })}
         />
-        <Form.Control.Feedback type="invalid">
-          Informe uma data a partir de hoje.
-        </Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid">{erroData}</Form.Control.Feedback>
       </Form.Group>
       <Form.Group className="mb-2" controlId="editar-descricao">
         <Form.Label>Descrição / observações</Form.Label>

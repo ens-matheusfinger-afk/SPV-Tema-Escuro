@@ -19,7 +19,7 @@ const Pedidos = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-    // Agora com FK de verdade - a tabela "clientes" (do Felipe) já foi mesclada.
+    // FK de verdade para a tabela "clientes".
     idCliente: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -66,6 +66,44 @@ const Pedidos = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    // SPV-118: quem liberou o pedido para cliente inadimplente, e por quê
+    idLiberadoPor: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    motivoLiberacao: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    // SPV-73: desconto. total = subtotal (soma dos itens) - valorDesconto
+    subtotal: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0,
+    },
+    descontoTipo: {
+      type: DataTypes.STRING(10), // 'valor' (R$) | 'percentual' (%) | null = sem desconto
+      allowNull: true,
+      validate: { isIn: { args: [['valor', 'percentual']], msg: 'Tipo de desconto inválido.' } },
+    },
+    descontoInformado: {
+      type: DataTypes.DECIMAL(10, 2), // número digitado: R$ ou %
+      allowNull: false,
+      defaultValue: 0,
+    },
+    valorDesconto: {
+      type: DataTypes.DECIMAL(10, 2), // quanto o desconto deu em R$
+      allowNull: false,
+      defaultValue: 0,
+    },
+    motivoDesconto: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    idDescontoPor: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
   {
     tableName: 'pedidos',
@@ -76,5 +114,7 @@ const Pedidos = sequelize.define(
 
 Pedidos.belongsTo(Usuario, { foreignKey: 'idVendedor', as: 'vendedor' });
 Pedidos.belongsTo(Cliente, { foreignKey: 'idCliente', as: 'cliente' });
+Pedidos.belongsTo(Usuario, { foreignKey: 'idLiberadoPor', as: 'liberadoPor' }); // SPV-118
+Pedidos.belongsTo(Usuario, { foreignKey: 'idDescontoPor', as: 'descontoPor' }); // SPV-73
 
 module.exports = Pedidos;

@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import StatusBadge from '../../../../components/StatusBadge/StatusBadge'
 import EstadoVazio from '../../../../components/EstadoVazio/EstadoVazio'
 import { formatarDia, formatarMoeda } from '../../../../utils/formatters'
-import { pedidoAtrasado } from '../../filtros'
+import PrazoPedido from '../PrazoPedido/PrazoPedido'
 import './PedidosTabela.css'
 
 export default function PedidosTabela({ pedidos, mensagemVazia = 'Nenhum pedido encontrado.' }) {
@@ -31,7 +31,6 @@ export default function PedidosTabela({ pedidos, mensagemVazia = 'Nenhum pedido 
         </thead>
         <tbody>
           {pedidos.map((p) => {
-            const atrasado = pedidoAtrasado(p)
             return (
               <tr
                 key={p.id}
@@ -57,12 +56,8 @@ export default function PedidosTabela({ pedidos, mensagemVazia = 'Nenhum pedido 
                   </span>
                 </td>
                 <td className="text-nowrap">
-                  {formatarDia(p.dataEntregaPrevista)}
-                  {atrasado && (
-                    <span className="badge text-bg-danger ms-2" title="Data de entrega já passou">
-                      Atrasado
-                    </span>
-                  )}
+                  <div>{formatarDia(p.dataEntregaPrevista)}</div>
+                  <PrazoPedido pedido={p} />
                 </td>
                 <td>
                   <StatusBadge status={p.status} />

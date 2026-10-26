@@ -13,11 +13,16 @@ import ServicosPage from '../modules/servicos/ServicosPage'
 import UsuariosPage from '../modules/usuarios/UsuariosPage'
 import EstoquePage from '../modules/estoque/EstoquePage'
 import CaixaPage from '../modules/financeiro/CaixaPage'
+import FinanceiroPage from '../modules/financeiro/FinanceiroPage'
 import ContasPagarPage from '../modules/financeiro/ContasPagarPage'
 import ContasReceberPage from '../modules/financeiro/ContasReceberPage'
 import PendenciasPage from '../modules/financeiro/PendenciasPage'
+import FluxoCaixaPage from '../modules/financeiro/FluxoCaixaPage'
 import PedidoDetalhePage from '../modules/pedidos/PedidoDetalhePage'
+import PedidosPorClientePage from '../modules/pedidos/PedidosPorClientePage'
+import PedidosEntregasPage from '../modules/pedidos/PedidosEntregasPage'
 import MeuUsuarioPage from '../modules/conta/MeuUsuarioPage'
+import LogsPage from '../modules/logs/LogsPage'
 
 /*
  * Fonte única de rotas + menu.
@@ -55,12 +60,26 @@ export const MENU = [
         componente: PedidosPendentesPage,
       },
       {
+        label: 'Próximas entregas',
+        icone: 'bi-calendar-week',
+        path: '/pedidos/entregas',
+        tela: TELAS.PEDIDOS,
+        componente: PedidosEntregasPage,
+      },
+      {
         label: 'Todos os pedidos',
         icone: 'bi-list-ul',
         path: '/pedidos',
         tela: TELAS.PEDIDOS,
         componente: PedidosListaPage,
         ativoEm: /^\/pedidos\/\d+$/,
+      },
+      {
+        label: 'Por cliente',
+        icone: 'bi-person-lines-fill',
+        path: '/pedidos/cliente',
+        tela: TELAS.PEDIDOS,
+        componente: PedidosPorClientePage,
       },
       {
         label: 'Aguardando cliente',
@@ -117,6 +136,14 @@ export const MENU = [
         tela: TELAS.USUARIOS,
         componente: UsuariosPage,
       },
+      {
+        // SPV-111 / REQ028: quem administra os usuários também consulta os logs
+        label: 'Logs do sistema',
+        icone: 'bi-journal-text',
+        path: '/logs',
+        tela: TELAS.USUARIOS,
+        componente: LogsPage,
+      },
     ],
   },
   {
@@ -131,11 +158,27 @@ export const MENU = [
     icone: 'bi-cash-coin',
     itens: [
       {
+        // SPV-82: aparece para quem tem qualquer uma das telas do financeiro
+        label: 'Visão geral',
+        icone: 'bi-speedometer2',
+        path: '/financeiro',
+        tela: [TELAS.CONTAS_PAGAR, TELAS.CONTAS_RECEBER, TELAS.CAIXA],
+        componente: FinanceiroPage,
+      },
+      {
         label: 'Fechamento de caixa',
         icone: 'bi-safe',
         path: '/financeiro/caixa',
         tela: TELAS.CAIXA,
         componente: CaixaPage,
+      },
+      {
+        // SPV-81: relatório de fluxo de caixa (o que entrou e saiu no período)
+        label: 'Fluxo de caixa',
+        icone: 'bi-graph-up',
+        path: '/financeiro/fluxo-caixa',
+        tela: TELAS.CAIXA,
+        componente: FluxoCaixaPage,
       },
       {
         label: 'Contas a pagar',

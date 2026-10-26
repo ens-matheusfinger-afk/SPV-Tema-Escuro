@@ -1,0 +1,35 @@
+/* Selo de situação das contas (SPV-85/86/98) */
+.spv-situacao-conta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.spv-situacao-quitada {
+  color: #0b8a5f;
+}
+.spv-situacao-vencida {
+  color: var(--bs-danger);
+}
+.spv-situacao-pedido-atrasado {
+  color: #8a6100;
+}
+.spv-situacao-vence-hoje {
+  color: #c2410c;
+}
+.spv-situacao-vence-logo {
+  color: #b45309;
+}
+.spv-situacao-a-vencer,
+.spv-situacao-sem-vencimento {
+  color: var(--spv-muted);
+  font-weight: 500;
+}
+
+.spv-situacao-forma {
+  font-weight: 500;
+  color: var(--spv-muted);
+}

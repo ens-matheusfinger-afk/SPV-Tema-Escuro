@@ -149,3 +149,7 @@ export const MINUTOS_INATIVIDADE = 15
 
 // Regra mínima para senhas novas
 export const TAMANHO_MINIMO_SENHA = 6
+
+// SPV-107 — limites contra erro de digitação (Poka-Yoke)
+export const QUANTIDADE_MAXIMA_ITEM = 9999
+export const DIAS_MAXIMOS_ENTREGA = 365

@@ -1,0 +1,8 @@
+/* Aguardando cliente / retirada (REQ012) */
+.spv-retirada-urgente td {
+  background: #fff7f5 !important;
+}
+
+.spv-retirada-desc {
+  max-width: 14rem;
+}

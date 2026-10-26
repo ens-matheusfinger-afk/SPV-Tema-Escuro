@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Alert, Button, Form, Spinner, ToggleButton, ToggleButtonGroup } from 'react-bootstrap'
 import EstadoVazio from '../../../../components/EstadoVazio/EstadoVazio'
 import { formatarMoeda } from '../../../../utils/formatters'
+import { QUANTIDADE_MAXIMA_ITEM } from '../../../../utils/constants'
 import { mensagemDeErro } from '../../../../services/api'
 import './ItensEditor.css'
 
@@ -21,6 +22,7 @@ export default function ItensEditor({
   aoAdicionar,
   aoAlterarQuantidade,
   aoRemover,
+  rotuloTotal = 'Total',
 }) {
   const [ocupado, setOcupado] = useState(false)
   const [erro, setErro] = useState('')
@@ -129,7 +131,7 @@ export default function ItensEditor({
             <tfoot>
               <tr>
                 <td colSpan={2} className="fw-semibold">
-                  Total
+                  {rotuloTotal}
                   {ocupado && <Spinner size="sm" className="ms-2" />}
                 </td>
                 <td className="d-none d-sm-table-cell"></td>
@@ -154,7 +156,7 @@ function SeletorItem({ catalogo, saldoDisponivel, ocupado, aoAdicionar }) {
   const escolhido = lista.find((x) => x.id === Number(idSelecionado))
   const saldo = tipo === 'produto' && escolhido ? saldoDisponivel(escolhido.id) : null
   const qtd = Number(quantidade)
-  const qtdValida = Number.isInteger(qtd) && qtd >= 1
+  const qtdValida = Number.isInteger(qtd) && qtd >= 1 && qtd <= QUANTIDADE_MAXIMA_ITEM
   const semSaldo = saldo !== null && qtd > saldo
 
   const adicionar = async () => {
@@ -225,7 +227,7 @@ function SeletorItem({ catalogo, saldoDisponivel, ocupado, aoAdicionar }) {
             type="number"
             min={1}
             step={1}
-            max={saldo ?? undefined}
+            max={saldo ?? QUANTIDADE_MAXIMA_ITEM}
             value={quantidade}
             isInvalid={!qtdValida || semSaldo}
             onChange={(e) => setQuantidade(e.target.value)}
@@ -256,7 +258,8 @@ function SeletorItem({ catalogo, saldoDisponivel, ocupado, aoAdicionar }) {
       )}
       {!qtdValida && (
         <div className="small text-danger mt-2">
-          A quantidade deve ser um número inteiro a partir de 1.
+          A quantidade deve ser um número inteiro de 1 a{' '}
+          {QUANTIDADE_MAXIMA_ITEM.toLocaleString('pt-BR')}.
         </div>
       )}
     </div>
@@ -269,7 +272,7 @@ function QuantidadeInput({ valor, desabilitado, rotulo, aoConfirmar }) {
 
   const confirmar = async () => {
     const n = Number(texto)
-    if (!Number.isInteger(n) || n < 1) {
+    if (!Number.isInteger(n) || n < 1 || n > QUANTIDADE_MAXIMA_ITEM) {
       setTexto(String(valor))
       return
     }
@@ -284,6 +287,7 @@ function QuantidadeInput({ valor, desabilitado, rotulo, aoConfirmar }) {
       size="sm"
       min={1}
       step={1}
+      max={QUANTIDADE_MAXIMA_ITEM}
       className="spv-qtd mx-auto text-center"
       aria-label={rotulo}
       value={texto}

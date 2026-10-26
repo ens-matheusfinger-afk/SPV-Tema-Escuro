@@ -1,4 +1,5 @@
 const Produtos = require('../models/produtosModels');
+const ItensPedido = require('../models/itensPedidoModels');
 
 // POST /produtos - REQ007: Cadastro de Produtos
 // Diagrama de Classes chama este método de "cadastra()"
@@ -82,6 +83,14 @@ exports.deleta = async (req, res) => {
 
     if (!produto) {
       return res.status(404).json({ erro: 'Produto não encontrado.' });
+    }
+
+    // Não exclui o que já foi vendido: o pedido perderia a referência do item
+    const usadoEmPedidos = await ItensPedido.count({ where: { idProduto: id } });
+    if (usadoEmPedidos > 0) {
+      return res.status(409).json({
+        erro: `Este produto já foi usado em ${usadoEmPedidos} item(ns) de pedido e não pode ser excluído. Você pode editar o nome ou o valor.`,
+      });
     }
 
     await produto.destroy();

@@ -6,7 +6,9 @@ import AlertaErro from '../../components/AlertaErro/AlertaErro'
 import FiltroPedidos from './components/FiltroPedidos/FiltroPedidos'
 import PedidosTabela from './components/PedidosTabela/PedidosTabela'
 import { usePedidos } from './usePedidos'
-import { filtrarPedidos, pedidoAtrasado } from './filtros'
+import { filtrarPedidos, ordenarPedidos, pedidoAtrasado, pedidoVencendo } from './filtros'
+import BotaoExportar from '../../components/BotaoExportar/BotaoExportar'
+import { exportarPedidos } from './exportarPedidos'
 import { STATUS_ABERTOS, STATUS_PEDIDO } from '../../utils/constants'
 import './PedidosPendentesPage.css'
 
@@ -20,11 +22,12 @@ const CORES = {
 // REQ009 — pedidos em aberto, com contadores por etapa (REQ040 — gestão visual)
 export default function PedidosPendentesPage() {
   const { dados: todos, carregando, erro, recarregar } = usePedidos()
-  const [filtro, setFiltro] = useState({ busca: '', status: '' })
+  const [filtro, setFiltro] = useState({ busca: '', status: '', ordem: 'entrega' })
 
   const abertos = todos ? todos.filter((p) => STATUS_ABERTOS.includes(p.status)) : []
-  const visiveis = filtrarPedidos(abertos, filtro)
+  const visiveis = ordenarPedidos(filtrarPedidos(abertos, filtro), filtro.ordem)
   const atrasados = abertos.filter(pedidoAtrasado).length
+  const vencendo = abertos.filter(pedidoVencendo).length
 
   const alternarStatus = (status) =>
     setFiltro((f) => ({ ...f, status: f.status === String(status) ? '' : String(status) }))
@@ -35,6 +38,10 @@ export default function PedidosPendentesPage() {
         titulo="Pedidos pendentes"
         subtitulo="Pedidos em andamento, do cadastro até a retirada"
       >
+        <BotaoExportar
+          quantidade={visiveis.length}
+          aoExportar={() => exportarPedidos(visiveis, 'pedidos-pendentes')}
+        />
         <Link to="/pedidos/novo" className="btn btn-primary">
           <i className="bi bi-plus-lg me-1" aria-hidden="true"></i>
           Novo pedido
@@ -67,7 +74,28 @@ export default function PedidosPendentesPage() {
               </div>
             )
           })}
-          <div className="col-12 col-lg">
+          <div className="col-6 col-lg">
+            <button
+              type="button"
+              className={`spv-contador ${filtro.status === 'vencendo' ? 'ativo' : ''}`}
+              style={{ '--cor': '#e8590c' }}
+              aria-pressed={filtro.status === 'vencendo'}
+              onClick={() => alternarStatus('vencendo')}
+              title="Vencem hoje, amanhã ou já usaram 75% do prazo"
+            >
+              <div
+                className="spv-contador-numero"
+                style={vencendo ? { color: '#c2410c' } : undefined}
+              >
+                {vencendo}
+              </div>
+              <div className="spv-contador-rotulo">
+                <i className="bi bi-hourglass-split me-1" aria-hidden="true"></i>
+                Vencendo
+              </div>
+            </button>
+          </div>
+          <div className="col-6 col-lg">
             <button
               type="button"
               className={`spv-contador ${filtro.status === 'atrasados' ? 'ativo' : ''}`}
@@ -92,6 +120,7 @@ export default function PedidosPendentesPage() {
           <FiltroPedidos
             busca={filtro.busca}
             status={filtro.status}
+            ordem={filtro.ordem}
             statusDisponiveis={STATUS_ABERTOS}
             aoMudar={setFiltro}
           />

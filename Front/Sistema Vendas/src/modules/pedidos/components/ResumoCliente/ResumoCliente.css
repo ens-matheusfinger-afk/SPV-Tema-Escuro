@@ -1,0 +1,27 @@
+/* Cartões de resumo do cliente (SPV-59) — mesmo estilo dos contadores de pendentes */
+.spv-resumo-cliente {
+  height: 100%;
+  padding: 0.9rem 1rem;
+  background: var(--spv-surface);
+  border: 1px solid var(--spv-border);
+  border-left: 4px solid var(--cor, var(--spv-sky));
+  border-radius: 0.6rem;
+}
+
+.spv-resumo-cliente-rotulo {
+  font-size: 0.8rem;
+  color: var(--spv-muted);
+}
+
+.spv-resumo-cliente-valor {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--spv-ink);
+  word-break: break-word;
+}
+
+.spv-resumo-cliente-detalhe {
+  font-size: 0.78rem;
+  color: var(--spv-muted);
+}

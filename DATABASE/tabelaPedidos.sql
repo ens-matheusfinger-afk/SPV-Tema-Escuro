@@ -22,3 +22,8 @@ CREATE TABLE IF NOT EXISTS pedidos (
 	total NUMERIC(10,2) NOT NULL DEFAULT 0,
 	anexo VARCHAR(255)
 );
+
+-- SPV-118: pedido aberto para cliente inadimplente só com liberação de quem tem acesso
+-- ao financeiro (Contas a receber). Fica registrado quem liberou e por quê.
+ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS id_liberado_por INTEGER REFERENCES usuarios(id);
+ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS motivo_liberacao VARCHAR(255);

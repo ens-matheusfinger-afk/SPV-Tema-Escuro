@@ -6,14 +6,16 @@ import AlertaErro from '../../components/AlertaErro/AlertaErro'
 import FiltroPedidos from './components/FiltroPedidos/FiltroPedidos'
 import PedidosTabela from './components/PedidosTabela/PedidosTabela'
 import { usePedidos } from './usePedidos'
-import { filtrarPedidos } from './filtros'
+import { filtrarPedidos, ordenarPedidos } from './filtros'
+import BotaoExportar from '../../components/BotaoExportar/BotaoExportar'
+import { exportarPedidos } from './exportarPedidos'
 
 // Todos os pedidos, de qualquer status (REQ005 / REQ009)
 export default function PedidosListaPage() {
   const { dados: pedidos, carregando, erro, recarregar } = usePedidos()
-  const [filtro, setFiltro] = useState({ busca: '', status: '' })
+  const [filtro, setFiltro] = useState({ busca: '', status: '', ordem: 'recentes' })
 
-  const visiveis = pedidos ? filtrarPedidos(pedidos, filtro) : []
+  const visiveis = pedidos ? ordenarPedidos(filtrarPedidos(pedidos, filtro), filtro.ordem) : []
 
   return (
     <>
@@ -21,6 +23,10 @@ export default function PedidosListaPage() {
         titulo="Todos os pedidos"
         subtitulo="Consulte qualquer pedido e abra para gerenciar"
       >
+        <BotaoExportar
+          quantidade={visiveis.length}
+          aoExportar={() => exportarPedidos(visiveis, 'pedidos')}
+        />
         <Link to="/pedidos/novo" className="btn btn-primary">
           <i className="bi bi-plus-lg me-1" aria-hidden="true"></i>
           Novo pedido
@@ -34,6 +40,7 @@ export default function PedidosListaPage() {
           <FiltroPedidos
             busca={filtro.busca}
             status={filtro.status}
+            ordem={filtro.ordem}
             statusDisponiveis={[1, 2, 3, 4, 5, 6]}
             aoMudar={setFiltro}
           />

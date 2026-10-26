@@ -1,0 +1,65 @@
+/* Alerta de prazo do pedido (SPV-115): selo colorido + barra de prazo consumido */
+
+.spv-prazo {
+  --cor-prazo: var(--spv-emerald);
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  vertical-align: middle;
+}
+
+.spv-prazo-selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.spv-prazo-barra {
+  display: block;
+  width: 100%;
+  min-width: 5.5rem;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--spv-border);
+  overflow: hidden;
+}
+
+.spv-prazo-barra > span {
+  display: block;
+  height: 100%;
+  background: var(--cor-prazo);
+}
+
+/* Com folga: texto discreto */
+.spv-prazo-ok .spv-prazo-selo {
+  color: var(--spv-muted);
+  font-weight: 500;
+}
+
+/* Atenção: amarelo */
+.spv-prazo-atencao {
+  --cor-prazo: #f5b400;
+}
+.spv-prazo-atencao .spv-prazo-selo {
+  color: #8a6100;
+}
+
+/* Vence hoje: laranja */
+.spv-prazo-hoje {
+  --cor-prazo: #e8590c;
+}
+.spv-prazo-hoje .spv-prazo-selo {
+  color: #c2410c;
+}
+
+/* Atrasado: vermelho */
+.spv-prazo-atrasado {
+  --cor-prazo: var(--bs-danger);
+}
+.spv-prazo-atrasado .spv-prazo-selo {
+  color: var(--bs-danger);
+}

@@ -1,0 +1,148 @@
+/* Telas do financeiro (SPV-82/85/86/98/99/100) */
+
+.spv-fin-card {
+  height: 100%;
+  padding: 0.9rem 1rem;
+  background: var(--spv-surface);
+  border: 1px solid var(--spv-border);
+  border-left: 4px solid var(--cor, var(--spv-sky));
+  border-radius: 0.6rem;
+}
+
+button.spv-fin-card {
+  width: 100%;
+  text-align: left;
+}
+
+button.spv-fin-card.ativo {
+  box-shadow: 0 0 0 2px var(--cor, var(--spv-sky));
+}
+
+.spv-fin-card-rotulo {
+  font-size: 0.8rem;
+  color: var(--spv-muted);
+}
+
+.spv-fin-card-valor {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--spv-ink);
+  white-space: nowrap;
+}
+
+.spv-fin-card-detalhe {
+  font-size: 0.78rem;
+  color: var(--spv-muted);
+}
+
+.spv-baixa-resumo {
+  padding: 0.75rem 1rem;
+  background: var(--spv-surface-2, #f4f8fc);
+  border: 1px solid var(--spv-border);
+  border-radius: 0.5rem;
+}
+
+/* Linhas quitadas ficam mais apagadas na lista */
+.spv-conta-quitada td {
+  color: var(--spv-muted);
+}
+
+/* Previsão dos próximos 15 dias (SPV-99/100) */
+.spv-previsao {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.spv-previsao li {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr 1fr 7rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+}
+
+.spv-previsao li + li {
+  border-top: 1px solid var(--spv-border);
+}
+
+.spv-previsao-barra {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.spv-previsao-barra > span {
+  display: inline-block;
+  height: 0.55rem;
+  border-radius: 1rem;
+  min-width: 2px;
+}
+
+.spv-previsao-entrada > span {
+  background: var(--spv-emerald);
+}
+
+.spv-previsao-saida > span {
+  background: #f07167;
+}
+
+.spv-previsao-saldo {
+  text-align: right;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+  .spv-previsao li {
+    grid-template-columns: 4.5rem 1fr 1fr;
+  }
+
+  .spv-previsao-saldo {
+    display: none;
+  }
+}
+
+/* Fluxo de caixa (SPV-81) */
+.spv-fluxo-lista li {
+  padding: 0.55rem 1rem;
+}
+
+.spv-fluxo-lista li + li {
+  border-top: 1px solid var(--spv-border);
+}
+
+.spv-fluxo-trilho {
+  display: block;
+  height: 0.4rem;
+  margin-top: 0.3rem;
+  border-radius: 1rem;
+  background: var(--spv-surface-2, #f1f5f9);
+  overflow: hidden;
+}
+
+.spv-fluxo-trilho > span {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 1rem;
+}
+
+.spv-fluxo-anterior td {
+  color: var(--spv-muted);
+  font-style: italic;
+}
+
+@media print {
+  .spv-fin-card {
+    break-inside: avoid;
+  }
+
+  .spv-card {
+    break-inside: avoid;
+  }
+}

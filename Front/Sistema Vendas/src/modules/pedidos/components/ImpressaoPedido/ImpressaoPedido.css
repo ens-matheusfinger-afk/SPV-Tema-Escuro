@@ -17,17 +17,61 @@
   text-align: left;
 }
 
+/* Etiqueta 100 x 100 mm (página) - 3 mm de margem de cada lado = 94 x 94 mm (SPV-69) */
 .spv-etiqueta {
   width: 94mm;
+  height: 94mm;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5mm;
+  overflow: hidden;
   border: 1.5pt solid #000;
   border-radius: 3mm;
-  padding: 3mm 4mm;
+  padding: 3.5mm 4mm;
   color: #000;
   font-size: 10pt;
 }
 
+.spv-etiqueta-marca {
+  font-size: 7.5pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
 .spv-etiqueta-numero {
-  font-size: 28pt;
+  font-size: 34pt;
   font-weight: 800;
   line-height: 1;
+}
+
+.spv-etiqueta-entrega {
+  font-size: 14pt;
+  font-weight: 800;
+}
+
+.spv-etiqueta-bloco {
+  border-top: 1pt solid #000;
+  padding-top: 2mm;
+}
+
+.spv-etiqueta-cliente {
+  font-size: 13pt;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.spv-etiqueta-itens {
+  font-size: 9.5pt;
+  line-height: 1.35;
+}
+
+/* Observação ocupa o espaço que sobrar no rodapé, cortada em até 2 linhas */
+.spv-etiqueta-obs {
+  margin-top: auto;
+  font-size: 8.5pt;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

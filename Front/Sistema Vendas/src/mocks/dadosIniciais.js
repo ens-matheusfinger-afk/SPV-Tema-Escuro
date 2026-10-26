@@ -11,6 +11,12 @@ function diaRelativo(dias) {
   return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), 3)).toISOString()
 }
 
+// "AAAA-MM-DD" daqui a N dias (contas a pagar/receber guardam só o dia)
+function diaISO(dias) {
+  const d = new Date(Date.now() + dias * dia)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 function momentoRelativo(dias) {
   return new Date(Date.now() + dias * dia).toISOString()
 }
@@ -18,13 +24,23 @@ function momentoRelativo(dias) {
 export function criarDadosIniciais() {
   const clientes = [
     { id: 1, nome: 'Maria Silva', telefone: '41999990001', email: 'maria@email.com', status: true },
-    { id: 2, nome: 'João Pereira', telefone: '41988880002', email: 'joao@email.com', status: true },
+    {
+      id: 2,
+      nome: 'João Pereira',
+      telefone: '41988880002',
+      email: 'joao@email.com',
+      status: true,
+      fatorConfianca: 2,
+      observacao: 'Atrasou o pagamento duas vezes. Só liberar o pedido com pagamento na retirada.',
+    },
     {
       id: 3,
       nome: 'Escola Aprender Ltda',
       telefone: '4133330003',
       email: 'contato@aprender.com',
       status: true,
+      fatorConfianca: 5,
+      observacao: 'Pedidos grandes no início do semestre. Falar com a Sra. Rosa (secretaria).',
     },
     {
       id: 4,
@@ -241,5 +257,140 @@ export function criarDadosIniciais() {
     servicos,
     pedidos,
     itensPedido,
+    anexosPedido: [],
+    // SPV-84/97: caixa de ontem fechado; hoje com vendas no balcão e uma compra em dinheiro
+    fechamentosCaixa: [
+      {
+        id: 1,
+        data: diaISO(-1),
+        saldoInicial: '0.00',
+        entradasDinheiro: '150.00',
+        entradasPix: '320.00',
+        entradasCartao: '89.90',
+        saidasDinheiro: '0.00',
+        saidasOutras: '0.00',
+        dinheiroEsperado: '150.00',
+        dinheiroContado: '150.00',
+        diferenca: '0.00',
+        observacao: null,
+        idUsuario: 1,
+        fechadoEm: momentoRelativo(-0.6),
+      },
+    ],
+    caixa: [
+      ['entrada', 'dinheiro', '150.00', 'Venda no balcão: 5 canecas', -1, 2],
+      ['entrada', 'pix', '320.00', 'Venda no balcão: uniformes', -1, 2],
+      ['entrada', 'cartao', '89.90', 'Venda no balcão: kit presente', -1, 2],
+      ['entrada', 'cartao', '45.00', 'Venda no balcão: 1 caneca personalizada', 0, 2],
+      ['saida', 'dinheiro', '30.00', 'Compra de linha (armarinho)', 0, 1],
+    ].map(([tipo, formaPagamento, valor, descricao, quando, idUsuario], i) => ({
+      id: i + 1,
+      // ontem às 15h / hoje um pouco antes de agora
+      data:
+        quando === 0
+          ? new Date(Date.now() - (5 - i) * 60000).toISOString()
+          : new Date(`${diaISO(-1)}T15:0${i}:00`).toISOString(),
+      tipo,
+      formaPagamento,
+      valor,
+      descricao,
+      idPedido: null,
+      idContaReceber: null,
+      idContaPagar: null,
+      idUsuario,
+    })),
+    // SPV-86: [descrição, categoria, fornecedor, valor, vence em X dias, pago há Y dias (null = em aberto), forma]
+    contasPagar: [
+      ['Aluguel do galpão', 'Aluguel', 'Imobiliária Centro', '1800.00', -2, null, null],
+      ['Conta de energia', 'Energia e água', 'Copel', '412.35', 1, null, null],
+      ['Malha PV 40 kg', 'Matéria-prima', 'Têxtil Paraná', '1290.00', 6, null, null],
+      ['Internet fibra', 'Internet e telefone', 'NetSul', '129.90', 12, null, null],
+      ['Linhas e aviamentos', 'Matéria-prima', 'Armarinho Central', '236.40', 20, null, null],
+      ['Salário costureira', 'Salários', null, '2100.00', -5, 5, 'transferencia'],
+      ['DAS Simples Nacional', 'Impostos', 'Receita Federal', '380.12', -10, 11, 'boleto'],
+    ].map(([descricao, tipo, fornecedor, valor, vence, pago, forma], i) => ({
+      id: i + 1,
+      item: 1,
+      tipo,
+      descricao,
+      fornecedor,
+      valor,
+      dataVencimento: diaISO(vence),
+      dataCriacao: diaISO(Math.min(vence, 0) - 10),
+      dataPagamento: pago === null ? null : diaISO(-pago),
+      formaPagamento: forma,
+    })),
+    // SPV-85: contas avulsas e um sinal já recebido. As contas dos pedidos o mock cria sozinho
+    // (igual à trigger trg_pedidos_conta_receber do banco).
+    contasReceber: [
+      {
+        id: 1,
+        idPedido: 1,
+        idCliente: 3,
+        descricao: 'Pedido nº 1',
+        total: '1723.50',
+        dataPrevisao: diaRelativo(2).slice(0, 10),
+        dataRecebimento: diaISO(-6),
+        formaPagamento: 'pix',
+        dataCriacao: diaISO(-6),
+      },
+      {
+        id: 2,
+        idPedido: null,
+        idCliente: 2,
+        descricao: 'Ajuste de 8 calças (sem pedido)',
+        total: '160.00',
+        dataPrevisao: diaISO(-5),
+        dataRecebimento: null,
+        formaPagamento: null,
+        dataCriacao: diaISO(-20),
+      },
+      {
+        id: 3,
+        idPedido: null,
+        idCliente: 4,
+        descricao: 'Arte para cartão de visita',
+        total: '60.00',
+        dataPrevisao: diaISO(9),
+        dataRecebimento: null,
+        formaPagamento: null,
+        dataCriacao: diaISO(-1),
+      },
+    ],
+    // o saldo inicial de cada produto entra como a primeira movimentação do histórico
+    movimentacoesEstoque: estoque.map((e, i) => ({
+      id: i + 1,
+      idProduto: e.idProduto,
+      tipo: 'entrada',
+      quantidade: e.estoqueAtual,
+      saldoAnterior: 0,
+      saldoAtual: e.estoqueAtual,
+      motivo: 'Saldo inicial',
+      idPedido: null,
+      idUsuario: 1,
+      data: momentoRelativo(-10),
+    })),
+    conferencias: [],
+    // SPV-93/94/95: um apontamento concluído e um em andamento do operador (id 3)
+    apontamentos: [
+      {
+        id: 1,
+        idPedido: 1,
+        idUsuario: 3,
+        inicio: momentoRelativo(-1.1),
+        fim: momentoRelativo(-1),
+        quantidadeProduzida: 20,
+        observacao: 'Primeira leva das camisetas',
+      },
+      {
+        id: 2,
+        idPedido: 8,
+        idUsuario: 3,
+        inicio: momentoRelativo(-0.03),
+        fim: null,
+        quantidadeProduzida: null,
+        observacao: null,
+      },
+    ],
   }
 }

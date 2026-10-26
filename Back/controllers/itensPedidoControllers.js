@@ -3,14 +3,22 @@ const Pedidos = require('../models/pedidosModels');
 const Produtos = require('../models/produtosModels');
 const Servicos = require('../models/servicosModels');
 const Estoque = require('../models/estoqueModels');
+const MovimentacoesEstoque = require('../models/movimentacoesEstoqueModels');
+const { calcularTotalPedido } = require('../utils/descontos');
 
 const STATUS_CANCELADO = 6;
 
-// Recalcula o total do pedido somando quantidade * valorUnitario de cada item
+// Recalcula o pedido: subtotal = soma de quantidade * valorUnitario; total = subtotal - desconto (SPV-73)
 async function recalcularTotal(idPedido) {
   const itens = await ItensPedido.findAll({ where: { idPedido } });
-  const total = itens.reduce((soma, item) => soma + item.quantidade * Number(item.valorUnitario), 0);
-  await Pedidos.update({ total }, { where: { id: idPedido } });
+  const subtotal = itens.reduce((soma, item) => soma + item.quantidade * Number(item.valorUnitario), 0);
+  const pedido = await Pedidos.findByPk(idPedido);
+  const valores = calcularTotalPedido({
+    subtotal,
+    descontoTipo: pedido.descontoTipo,
+    descontoInformado: pedido.descontoInformado,
+  });
+  await pedido.update(valores);
 }
 
 // GET /pedidos/:id/itens - lista os itens de um pedido específico
@@ -82,8 +90,11 @@ exports.adicionar = async (req, res) => {
         if (estoque.estoqueAtual < quantidade) {
           return res.status(400).json({ erro: 'Saldo insuficiente em estoque.', estoqueAtual: estoque.estoqueAtual });
         }
-        estoque.estoqueAtual -= quantidade;
-        await estoque.save();
+        await MovimentacoesEstoque.movimentar(estoque, -quantidade, {
+          tipo: 'venda',
+          motivo: `Item adicionado ao pedido nº ${idPedido}`,
+          idPedido,
+        });
       }
     } else {
       if (!idServico) {
@@ -150,8 +161,12 @@ exports.editar = async (req, res) => {
         if (diferenca > 0 && estoque.estoqueAtual < diferenca) {
           return res.status(400).json({ erro: 'Saldo insuficiente em estoque.', estoqueAtual: estoque.estoqueAtual });
         }
-        estoque.estoqueAtual -= diferenca; // se diferenca for negativa, isso devolve ao estoque
-        await estoque.save();
+        // diferenca > 0 tira mais do estoque; diferenca < 0 devolve
+        await MovimentacoesEstoque.movimentar(estoque, -diferenca, {
+          tipo: diferenca > 0 ? 'venda' : 'devolucao',
+          motivo: `Quantidade alterada no pedido nº ${idPedido}`,
+          idPedido,
+        });
       }
     }
 
@@ -192,8 +207,11 @@ exports.remover = async (req, res) => {
       if (produto && produto.controlaEstoque) {
         const estoque = await Estoque.findOne({ where: { idProduto: item.idProduto } });
         if (estoque) {
-          estoque.estoqueAtual += item.quantidade;
-          await estoque.save();
+          await MovimentacoesEstoque.movimentar(estoque, item.quantidade, {
+            tipo: 'devolucao',
+            motivo: `Item removido do pedido nº ${idPedido}`,
+            idPedido,
+          });
         }
       }
     }

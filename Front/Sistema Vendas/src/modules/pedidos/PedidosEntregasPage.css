@@ -1,0 +1,102 @@
+/* Próximas entregas (SPV-116) */
+
+.spv-entregas-resumo {
+  height: 100%;
+  padding: 0.9rem 1rem;
+  background: var(--spv-surface);
+  border: 1px solid var(--spv-border);
+  border-left: 4px solid var(--cor, var(--spv-sky));
+  border-radius: 0.6rem;
+}
+
+.spv-entregas-resumo-rotulo {
+  font-size: 0.8rem;
+  color: var(--spv-muted);
+}
+
+.spv-entregas-resumo-valor {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--spv-ink);
+}
+
+.spv-entregas-resumo-detalhe {
+  font-size: 0.78rem;
+  color: var(--spv-muted);
+}
+
+/* Dia de hoje e bloco de atrasados ganham uma borda de destaque */
+.spv-dia-hoje {
+  border-left: 4px solid #f5b400;
+}
+
+.spv-dia-atrasado {
+  border-left: 4px solid var(--bs-danger);
+}
+
+.spv-entregas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.spv-entregas > li + li {
+  border-top: 1px solid var(--spv-border);
+}
+
+.spv-entrega {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  min-width: 0;
+}
+
+.spv-entrega-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.spv-entrega-wrap .spv-entrega {
+  flex: 1 1 auto;
+}
+
+.spv-entrega-prazo {
+  padding: 0 1rem 0.6rem;
+}
+
+@media (min-width: 768px) {
+  .spv-entrega-prazo {
+    padding: 0 1rem 0 0;
+  }
+}
+
+.spv-entrega-num {
+  flex: 0 0 3rem;
+  font-weight: 700;
+}
+
+.spv-entrega-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.spv-entrega-status {
+  flex: 0 0 auto;
+}
+
+.spv-entrega-total {
+  flex: 0 0 auto;
+  min-width: 6.5rem;
+  text-align: right;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+  .spv-entrega-status {
+    display: none;
+  }
+}

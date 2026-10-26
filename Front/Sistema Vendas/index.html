@@ -4,9 +4,188 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f1f4f8" />
     <title>SYS VENDAS</title>
+    <!--
+      Tela de carregamento (splash): aparece na hora em que a página abre, antes do React.
+      Fica tudo aqui no HTML (sem depender de CSS/JS do sistema) para não existir a tela branca.
+      Quem tira a splash é o src/main.jsx, depois que o sistema terminou de montar.
+    -->
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #f1f4f8;
+      }
+
+      #spv-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.4rem;
+        background: radial-gradient(circle at 50% 42%, #e8f4ff 0%, #f1f4f8 55%, #e9eef5 100%);
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        transition:
+          opacity 0.35s ease,
+          visibility 0.35s ease;
+      }
+
+      #spv-splash.saindo {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .spv-splash-anel {
+        position: relative;
+        width: 132px;
+        height: 132px;
+        display: grid;
+        place-items: center;
+      }
+
+      /* círculo girando em volta da logo (degradê azul -> verde da marca) */
+      .spv-splash-anel::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: conic-gradient(
+          from 0deg,
+          rgba(61, 167, 253, 0) 0deg,
+          #3da7fd 200deg,
+          #06d6a0 360deg
+        );
+        -webkit-mask: radial-gradient(
+          farthest-side,
+          transparent calc(100% - 6px),
+          #000 calc(100% - 5px)
+        );
+        mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px));
+        animation: spv-girar 1s linear infinite;
+      }
+
+      /* trilho clarinho por baixo do círculo */
+      .spv-splash-anel::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 6px solid rgba(61, 167, 253, 0.12);
+      }
+
+      .spv-splash-logo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #fff;
+        display: grid;
+        place-items: center;
+        box-shadow: 0 8px 24px rgba(15, 120, 204, 0.15);
+        animation: spv-pulsar 1.6s ease-in-out infinite;
+      }
+
+      .spv-splash-nome {
+        text-align: center;
+        line-height: 1.25;
+      }
+
+      .spv-splash-nome strong {
+        display: block;
+        font-size: 1.35rem;
+        letter-spacing: 0.04em;
+        color: #1e293b;
+      }
+
+      .spv-splash-nome span {
+        font-size: 0.85rem;
+        color: #64748b;
+      }
+
+      .spv-splash-texto {
+        font-size: 0.8rem;
+        color: #64748b;
+      }
+
+      .spv-splash-texto::after {
+        content: '';
+        animation: spv-pontos 1.2s steps(4, end) infinite;
+      }
+
+      @keyframes spv-girar {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes spv-pulsar {
+        50% {
+          transform: scale(0.95);
+        }
+      }
+
+      @keyframes spv-pontos {
+        0% {
+          content: '';
+        }
+        25% {
+          content: '.';
+        }
+        50% {
+          content: '..';
+        }
+        75% {
+          content: '...';
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .spv-splash-anel::before {
+          animation-duration: 3s;
+        }
+
+        .spv-splash-logo {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="spv-splash" role="status" aria-live="polite">
+      <div class="spv-splash-anel">
+        <div class="spv-splash-logo">
+          <!-- mesma logo do components/Logo/Logo.jsx -->
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <path
+              d="M18 46h30a11 11 0 0 0 1.6-21.9A15 15 0 0 0 20.3 21 12.5 12.5 0 0 0 18 46Z"
+              stroke="#3DA7FD"
+              stroke-width="4"
+              stroke-linejoin="round"
+            />
+            <rect x="25" y="30" width="14" height="18" rx="2.5" fill="#06D6A0" />
+            <path
+              d="M28.5 36h7M28.5 40h7M28.5 44h5"
+              stroke="#fff"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="spv-splash-nome">
+        <strong>SYS VENDAS</strong>
+        <span>Sistema de Pedidos e Vendas</span>
+      </div>
+      <div class="spv-splash-texto">Carregando</div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

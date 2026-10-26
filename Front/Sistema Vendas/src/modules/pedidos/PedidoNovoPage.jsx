@@ -1,53 +1,103 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Alert, Button, Form, Spinner } from 'react-bootstrap'
 import PageHeader from '../../components/PageHeader/PageHeader'
 import Carregando from '../../components/Carregando/Carregando'
 import AlertaErro from '../../components/AlertaErro/AlertaErro'
 import ItensEditor from './components/ItensEditor/ItensEditor'
 import SeletorCliente from './components/SeletorCliente/SeletorCliente'
+import AvisoCliente from '../../components/AvisoCliente/AvisoCliente'
+import BloqueioInadimplente from './components/BloqueioInadimplente/BloqueioInadimplente'
 import { useCarregar } from '../../hooks/useCarregar'
 import { useAuth } from '../../hooks/useAuth'
 import { useNotificacao } from '../../hooks/useNotificacao'
-import { listarClientes } from '../../services/clientesService'
+import { listarClientes, listarInadimplentes } from '../../services/clientesService'
 import { listarCatalogo } from '../../services/catalogoService'
 import { criarPedido } from '../../services/pedidosService'
+import { ACCEPT, enviarAnexos, validarArquivos } from '../../services/anexosService'
 import { mensagemDeErro } from '../../services/api'
-import { formatarDocumento, formatarMoeda, formatarTelefone, hojeISO } from '../../utils/formatters'
+import {
+  formatarDocumento,
+  formatarMoeda,
+  formatarTamanho,
+  formatarTelefone,
+  hojeISO,
+} from '../../utils/formatters'
+import { dataMaximaEntrega, erroDataEntrega } from '../../utils/validacoes'
+import { TELAS } from '../../utils/constants'
 import './PedidoNovoPage.css'
 
 const FORM_VAZIO = { idCliente: '', dataEntregaPrevista: '', descricao: '', anexo: '' }
 
 // Tela 3 do protótipo — Cadastro de Pedido (REQ004)
 export default function PedidoNovoPage() {
-  const { usuario } = useAuth()
+  const { usuario, podeAcessar } = useAuth()
   const notificar = useNotificacao()
   const navigate = useNavigate()
+  // SPV-59: "Novo pedido para este cliente" chega aqui com ?cliente=ID
+  const [params] = useSearchParams()
 
   const { dados, carregando, erro, recarregar } = useCarregar(async () => {
-    const [clientes, catalogo] = await Promise.all([listarClientes(), listarCatalogo()])
-    return { clientes, catalogo }
+    const [clientes, catalogo, devedores] = await Promise.all([
+      listarClientes(),
+      listarCatalogo(),
+      listarInadimplentes().catch(() => new Map()), // se falhar, o Back ainda bloqueia ao gerar
+    ])
+    return { clientes, catalogo, devedores }
   }, [])
 
-  const [form, setForm] = useState(FORM_VAZIO)
+  const [form, setForm] = useState(() => ({
+    ...FORM_VAZIO,
+    idCliente: params.get('cliente') ?? '',
+  }))
   const [itens, setItens] = useState([])
+  const [arquivos, setArquivos] = useState([]) // SPV-91: enviados depois que o pedido é gerado
+  const [erroArquivos, setErroArquivos] = useState('')
   const [tentouEnviar, setTentouEnviar] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [erroEnvio, setErroEnvio] = useState('')
+  // SPV-118: liberação de pedido para cliente devendo (vale só para o cliente escolhido)
+  const [liberacao, setLiberacao] = useState({ idCliente: null, ativo: false, motivo: '' })
+
+  // SPV-107: avisa antes de fechar/recarregar a aba com um pedido começado e não salvo
+  const comecado =
+    itens.length > 0 ||
+    arquivos.length > 0 ||
+    Boolean(form.descricao || form.anexo || form.dataEntregaPrevista)
+  useEffect(() => {
+    if (!comecado || enviando) return undefined
+    const avisar = (e) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', avisar)
+    return () => window.removeEventListener('beforeunload', avisar)
+  }, [comecado, enviando])
 
   if (carregando) return <Carregando texto="Carregando clientes e catálogo..." />
   if (erro) return <AlertaErro mensagem={erro} aoTentarNovamente={() => recarregar()} />
 
-  const { clientes, catalogo } = dados
+  const { clientes, catalogo, devedores } = dados
   const cliente = clientes.find((c) => c.id === Number(form.idCliente))
+  const devendo = cliente ? devedores.get(cliente.id) : null
+  const podeLiberar = podeAcessar(TELAS.CONTAS_RECEBER)
+  const liberacaoAtual =
+    liberacao.idCliente === cliente?.id
+      ? liberacao
+      : { idCliente: cliente?.id, ativo: false, motivo: '' }
+  const liberado =
+    Boolean(devendo) && liberacaoAtual.ativo && liberacaoAtual.motivo.trim().length >= 5
   const total = itens.reduce((s, i) => s + i.quantidade * i.valorUnitario, 0)
   const hoje = hojeISO()
 
   // Validações (REQ038 — evitar erro antes de enviar)
+  const erroData = erroDataEntrega(form.dataEntregaPrevista, hoje)
   const erros = {
-    idCliente: !form.idCliente,
+    // cliente precisa existir e estar ativo (o ?cliente= da URL pode apontar para um inativo)
+    idCliente: !cliente?.ativo,
+    inadimplente: Boolean(devendo) && !liberado,
     itens: itens.length === 0,
-    dataEntregaPrevista: !form.dataEntregaPrevista || form.dataEntregaPrevista < hoje,
+    dataEntregaPrevista: Boolean(erroData),
     anexo: Boolean(form.anexo) && !/^https?:\/\/\S+$/i.test(form.anexo.trim()),
   }
   const valido = !Object.values(erros).some(Boolean)
@@ -97,6 +147,8 @@ export default function PedidoNovoPage() {
   const limpar = () => {
     setForm(FORM_VAZIO)
     setItens([])
+    setArquivos([])
+    setErroArquivos('')
     setTentouEnviar(false)
     setErroEnvio('')
   }
@@ -116,7 +168,23 @@ export default function PedidoNovoPage() {
         dataEntregaPrevista: form.dataEntregaPrevista,
         anexo: form.anexo,
         itens,
+        liberacao: liberado
+          ? { idUsuario: usuario.id, motivo: liberacaoAtual.motivo.trim() }
+          : undefined,
       })
+      if (arquivos.length > 0) {
+        try {
+          await enviarAnexos(id, usuario.id, arquivos)
+        } catch (errAnexo) {
+          // o pedido já existe: avisa e segue (os arquivos podem ser anexados de novo no detalhe)
+          notificar(
+            `Pedido nº ${id} gerado, mas os anexos não foram enviados: ${mensagemDeErro(errAnexo)}`,
+            'warning',
+          )
+          navigate(`/pedidos/${id}`)
+          return
+        }
+      }
       notificar(`Pedido nº ${id} gerado com sucesso.`)
       navigate(`/pedidos/${id}`)
     } catch (err) {
@@ -160,6 +228,7 @@ export default function PedidoNovoPage() {
               <SeletorCliente
                 clientes={clientes}
                 valor={form.idCliente}
+                devedores={devedores}
                 invalido={mostrar('idCliente')}
                 aoMudar={(id) => setForm({ ...form, idCliente: id })}
               />
@@ -185,6 +254,15 @@ export default function PedidoNovoPage() {
                   )}
                 </div>
               )}
+              {/* SPV-119: confiança baixa ou observação do cliente aparecem aqui */}
+              <AvisoCliente cliente={cliente} className="mt-2" />
+              <BloqueioInadimplente
+                devendo={devendo}
+                podeLiberar={podeLiberar}
+                liberacao={liberacaoAtual}
+                aoMudar={setLiberacao}
+                mostrarErro={tentouEnviar}
+              />
             </div>
           </section>
 
@@ -217,18 +295,17 @@ export default function PedidoNovoPage() {
                 <Form.Control
                   type="date"
                   min={hoje}
+                  max={dataMaximaEntrega(hoje)}
                   value={form.dataEntregaPrevista}
                   isInvalid={mostrar('dataEntregaPrevista')}
                   onChange={alterar('dataEntregaPrevista')}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {form.dataEntregaPrevista
-                    ? 'A data não pode ser anterior a hoje.'
-                    : 'Informe a data prevista de entrega.'}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{erroData}</Form.Control.Feedback>
               </Form.Group>
               <Form.Group className="col-sm-7" controlId="anexo">
-                <Form.Label>Anexo (link do arquivo)</Form.Label>
+                <Form.Label>
+                  Link externo <span className="text-secondary fw-normal">(opcional)</span>
+                </Form.Label>
                 <Form.Control
                   type="url"
                   placeholder="https://drive.google.com/..."
@@ -251,6 +328,48 @@ export default function PedidoNovoPage() {
                   onChange={alterar('descricao')}
                 />
                 <Form.Text>{form.descricao.length}/255</Form.Text>
+              </Form.Group>
+              <Form.Group className="col-12" controlId="arquivos">
+                <Form.Label>
+                  Fotos e arquivos <span className="text-secondary fw-normal">(opcional)</span>
+                </Form.Label>
+                <Form.Control
+                  type="file"
+                  multiple
+                  accept={ACCEPT}
+                  isInvalid={Boolean(erroArquivos)}
+                  onChange={(e) => {
+                    const novos = [...arquivos, ...Array.from(e.target.files ?? [])]
+                    e.target.value = ''
+                    const problema = validarArquivos(novos)
+                    setErroArquivos(problema)
+                    if (!problema) setArquivos(novos)
+                  }}
+                />
+                <Form.Control.Feedback type="invalid">{erroArquivos}</Form.Control.Feedback>
+                <Form.Text>Arte, foto de referência, medidas... (até 10 MB cada)</Form.Text>
+                {arquivos.length > 0 && (
+                  <ul className="list-unstyled small mt-2 mb-0">
+                    {arquivos.map((f, i) => (
+                      <li key={`${f.name}-${i}`} className="d-flex align-items-center gap-2">
+                        <i className="bi bi-paperclip text-secondary" aria-hidden="true"></i>
+                        <span className="text-truncate">{f.name}</span>
+                        <span className="text-secondary text-nowrap">
+                          {formatarTamanho(f.size)}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="link"
+                          className="text-danger p-0 ms-auto"
+                          aria-label={`Tirar ${f.name}`}
+                          onClick={() => setArquivos(arquivos.filter((_, j) => j !== i))}
+                        >
+                          <i className="bi bi-x-lg" aria-hidden="true"></i>
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </Form.Group>
             </div>
           </section>
@@ -277,7 +396,9 @@ export default function PedidoNovoPage() {
 
               {tentouEnviar && !valido && (
                 <Alert variant="warning" className="small py-2">
-                  Confira os campos destacados em vermelho.
+                  {erros.inadimplente && !erros.itens && !erros.dataEntregaPrevista
+                    ? 'Cliente com pagamento vencido: o pedido só sai com liberação do financeiro.'
+                    : 'Confira os campos destacados em vermelho.'}
                 </Alert>
               )}
 
