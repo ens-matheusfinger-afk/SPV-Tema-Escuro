@@ -1,91 +1,289 @@
 /*
  * SYS VENDAS — estilos GLOBAIS (valem para o sistema inteiro)
- * Aqui ficam: variáveis de cor, body, ajustes do Bootstrap, padrões usados em
- * várias telas (cartões, tabelas, rótulos) e as regras gerais de impressão.
- * Estilo de UM componente fica no .css dentro da pasta dele.
+ * Tema: ESCURO / MODERNO (v2 do visual).
+ *
+ * Como funciona:
+ *  - O <html> abre com data-bs-theme="dark" (index.html). O Bootstrap 5.3 já tem modo escuro;
+ *    aqui só ajustamos as cores dele para a paleta do SPV.
+ *  - Todas as cores ficam em variáveis (--spv-*). As telas e componentes usam só as variáveis,
+ *    nunca uma cor "na mão" — assim o tema troca inteiro mudando este arquivo.
+ *  - Na impressão (REQ008) o tema vira CLARO automaticamente (ver src/utils/temaImpressao.js),
+ *    porque texto claro em papel branco ficaria invisível.
  *
  * Paleta oficial (Documento de Visão, Anexo Identidade Visual):
  *   #3DA7FD Cool Sky · #27D9AA Tropical Mint · #06D6A0 Emerald
+ * No escuro as cores da marca têm ótimo contraste, então viram o destaque principal
+ * (botões em degradê Sky → Mint, com texto escuro por cima).
  *
- * As cores da marca são claras demais para texto branco por cima (contraste baixo),
- * então botões e links usam um tom mais escuro do Cool Sky (--spv-primary).
- * A cor pura da marca fica para detalhes: item ativo do menu, bordas, foco, logo.
+ * Estilo de UM componente fica no .css dentro da pasta dele.
  */
 
+/* ---------- Tokens: tema CLARO (usado na impressão) ---------- */
 :root {
   /* Marca */
   --spv-sky: #3da7fd;
   --spv-mint: #27d9aa;
   --spv-emerald: #06d6a0;
+  --spv-gradiente: linear-gradient(135deg, var(--spv-sky) 0%, var(--spv-mint) 100%);
 
-  /* Derivadas para uso em UI */
   --spv-primary: #0f78cc;
   --spv-primary-hover: #0b6fbe;
   --spv-primary-soft: #e8f4ff;
+  --spv-on-accent: #04121f; /* texto em cima das cores da marca */
   --spv-ink: #1e293b;
   --spv-muted: #64748b;
   --spv-border: #e2e8f0;
-  --spv-bg: #f1f4f8;
+  --spv-border-strong: #cbd5e1;
+  --spv-bg: #ffffff;
   --spv-surface: #ffffff;
-  --spv-sidebar-width: 248px;
+  --spv-surface-2: #f1f5f9;
+  --spv-surface-3: #e2e8f0;
 
-  /* Bootstrap */
-  --bs-primary: var(--spv-primary);
-  --bs-primary-rgb: 15, 120, 204;
+  /* Cores de aviso para TEXTO (selos de prazo, situação de contas...) */
+  --spv-texto-sucesso: #0b8a5f;
+  --spv-texto-atencao: #8a6100;
+  --spv-texto-laranja: #c2410c;
+  --spv-texto-perigo: #b02a37;
+  /* Cores de aviso para BARRAS e bordas */
+  --spv-cor-atencao: #f5b400;
+  --spv-cor-laranja: #e8590c;
+  --spv-cor-saida: #f07167;
+  --spv-cor-neutra: #94a3b8;
+  --spv-fundo-perigo: #fff5f5;
+
+  --spv-sombra: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --spv-raio: 0.9rem;
+  --spv-raio-sm: 0.6rem;
+  --spv-sidebar-width: 264px;
+  --spv-sidebar-rail: 76px;
+  --spv-fonte:
+    'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --spv-fonte-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+}
+
+/* ---------- Tokens: tema ESCURO (padrão do sistema) ---------- */
+[data-bs-theme='dark'] {
+  --spv-primary: #3da7fd;
+  --spv-primary-hover: #63b8ff;
+  --spv-primary-soft: rgba(61, 167, 253, 0.14);
+  --spv-ink: #e7ecf5;
+  --spv-muted: #8d99b0;
+  --spv-border: rgba(148, 163, 184, 0.14);
+  --spv-border-strong: rgba(148, 163, 184, 0.28);
+  --spv-bg: #070b16;
+  --spv-surface: #0f1626;
+  --spv-surface-2: #161f33;
+  --spv-surface-3: #1e2943;
+
+  --spv-texto-sucesso: #34d399;
+  --spv-texto-atencao: #fbbf24;
+  --spv-texto-laranja: #fb923c;
+  --spv-texto-perigo: #f87171;
+  --spv-cor-atencao: #fbbf24;
+  --spv-cor-laranja: #fb923c;
+  --spv-cor-saida: #f87171;
+  --spv-cor-neutra: #64748b;
+  --spv-fundo-perigo: rgba(248, 113, 113, 0.08);
+
+  --spv-sombra: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+
+  /* Bootstrap (modo escuro) com a paleta do SPV */
+  --bs-body-bg: var(--spv-bg);
+  --bs-body-bg-rgb: 7, 11, 22;
+  --bs-body-color: var(--spv-ink);
+  --bs-body-color-rgb: 231, 236, 245;
+  --bs-emphasis-color: #ffffff;
+  --bs-secondary-color: var(--spv-muted);
+  --bs-secondary-bg: var(--spv-surface-2);
+  --bs-tertiary-bg: var(--spv-surface-2);
+  --bs-tertiary-color: var(--spv-muted);
+  --bs-border-color: var(--spv-border);
+  --bs-border-color-translucent: var(--spv-border);
+  --bs-heading-color: #f4f7fc;
+
+  --bs-primary: var(--spv-sky);
+  --bs-primary-rgb: 61, 167, 253;
+  --bs-primary-text-emphasis: #8ccaff;
+  --bs-primary-bg-subtle: rgba(61, 167, 253, 0.12);
+  --bs-primary-border-subtle: rgba(61, 167, 253, 0.35);
   --bs-success: var(--spv-emerald);
   --bs-success-rgb: 6, 214, 160;
-  --bs-link-color: var(--spv-primary);
-  --bs-link-color-rgb: 15, 120, 204;
-  --bs-link-hover-color: var(--spv-primary-hover);
-  --bs-link-hover-color-rgb: 11, 111, 190;
-  --bs-body-color: var(--spv-ink);
-  --bs-body-bg: var(--spv-bg);
-  --bs-border-color: var(--spv-border);
-  --bs-border-radius: 0.5rem;
+  --bs-link-color: #6cbcff;
+  --bs-link-color-rgb: 108, 188, 255;
+  --bs-link-hover-color: #a3d4ff;
+  --bs-link-hover-color-rgb: 163, 212, 255;
   --bs-focus-ring-color: rgba(61, 167, 253, 0.35);
+  --bs-border-radius: 0.6rem;
+  --bs-border-radius-sm: 0.45rem;
+  --bs-border-radius-lg: 0.9rem;
 }
+
+/* ---------- Base ---------- */
 
 body {
+  font-family: var(--spv-fonte);
   background: var(--spv-bg);
   color: var(--spv-ink);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Botões: o Bootstrap fixa as cores do .btn na compilação, por isso o override aqui */
-.btn-primary {
-  --bs-btn-bg: var(--spv-primary);
-  --bs-btn-border-color: var(--spv-primary);
-  --bs-btn-hover-bg: var(--spv-primary-hover);
-  --bs-btn-hover-border-color: var(--spv-primary-hover);
-  --bs-btn-active-bg: var(--spv-primary-hover);
-  --bs-btn-active-border-color: var(--spv-primary-hover);
-  --bs-btn-disabled-bg: var(--spv-primary);
-  --bs-btn-disabled-border-color: var(--spv-primary);
-  --bs-btn-focus-shadow-rgb: 61, 167, 253;
+/* Brilho de fundo bem suave (só na tela, não na impressão) */
+@media screen {
+  [data-bs-theme='dark'] body {
+    background:
+      radial-gradient(1100px 520px at 85% -10%, rgba(61, 167, 253, 0.1), transparent 60%),
+      radial-gradient(900px 480px at 0% 110%, rgba(6, 214, 160, 0.07), transparent 60%),
+      var(--spv-bg);
+    background-attachment: fixed;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5 {
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: rgba(61, 167, 253, 0.35);
+}
+
+/* Barra de rolagem discreta no tema escuro */
+[data-bs-theme='dark'] * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--spv-surface-3) transparent;
+}
+
+/* Números de dinheiro/quantidade alinham melhor com algarismos de mesma largura */
+.spv-total,
+.spv-fin-card-valor,
+.spv-estoque-resumo-valor,
+.spv-entregas-resumo-valor,
+.spv-tabela td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Botões ---------- */
+
+.btn {
   font-weight: 600;
+  border-radius: var(--bs-border-radius);
+}
+
+[data-bs-theme='dark'] .btn-primary {
+  --bs-btn-color: var(--spv-on-accent);
+  --bs-btn-bg: var(--spv-sky);
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-color: var(--spv-on-accent);
+  --bs-btn-hover-bg: var(--spv-primary-hover);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-color: var(--spv-on-accent);
+  --bs-btn-active-bg: var(--spv-mint);
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-disabled-color: var(--spv-on-accent);
+  --bs-btn-disabled-bg: var(--spv-sky);
+  --bs-btn-disabled-border-color: transparent;
+  --bs-btn-focus-shadow-rgb: 61, 167, 253;
+  background-image: var(--spv-gradiente);
+  box-shadow: 0 6px 18px -8px rgba(61, 167, 253, 0.7);
+}
+
+[data-bs-theme='dark'] .btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+/* Botão primário dentro de grupo (ex.: "Por mês | Por dia") fica sem sombra */
+.btn-group > .btn-primary {
+  box-shadow: none;
 }
 
 .btn-outline-primary {
   --bs-btn-color: var(--spv-primary);
-  --bs-btn-border-color: var(--spv-primary);
-  --bs-btn-hover-bg: var(--spv-primary);
-  --bs-btn-hover-border-color: var(--spv-primary);
-  --bs-btn-active-bg: var(--spv-primary-hover);
-  --bs-btn-active-border-color: var(--spv-primary-hover);
+  --bs-btn-border-color: var(--bs-primary-border-subtle, var(--spv-primary));
+  --bs-btn-hover-color: var(--spv-on-accent);
+  --bs-btn-hover-bg: var(--spv-sky);
+  --bs-btn-hover-border-color: var(--spv-sky);
+  --bs-btn-active-color: var(--spv-on-accent);
+  --bs-btn-active-bg: var(--spv-mint);
+  --bs-btn-active-border-color: var(--spv-mint);
   --bs-btn-focus-shadow-rgb: 61, 167, 253;
 }
 
 /* Emerald é claro: texto escuro por cima para manter a leitura */
 .btn-success {
-  --bs-btn-color: var(--spv-ink);
+  --bs-btn-color: var(--spv-on-accent);
   --bs-btn-bg: var(--spv-emerald);
   --bs-btn-border-color: var(--spv-emerald);
-  --bs-btn-hover-color: var(--spv-ink);
-  --bs-btn-hover-bg: #05c393;
-  --bs-btn-hover-border-color: #05c393;
-  --bs-btn-active-color: var(--spv-ink);
+  --bs-btn-hover-color: var(--spv-on-accent);
+  --bs-btn-hover-bg: #2ee6b6;
+  --bs-btn-hover-border-color: #2ee6b6;
+  --bs-btn-active-color: var(--spv-on-accent);
   --bs-btn-active-bg: #05b386;
   --bs-btn-active-border-color: #05b386;
-  font-weight: 600;
+  --bs-btn-disabled-color: var(--spv-on-accent);
+}
+
+/* "light" e "outline-secondary" são os botões neutros (Cancelar, Voltar, filtros) */
+[data-bs-theme='dark'] .btn-light {
+  --bs-btn-color: var(--spv-ink);
+  --bs-btn-bg: var(--spv-surface-2);
+  --bs-btn-border-color: var(--spv-border);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--spv-surface-3);
+  --bs-btn-hover-border-color: var(--spv-border-strong);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--spv-surface-3);
+  --bs-btn-active-border-color: var(--spv-border-strong);
+  --bs-btn-disabled-color: var(--spv-muted);
+  --bs-btn-disabled-bg: var(--spv-surface-2);
+  --bs-btn-disabled-border-color: var(--spv-border);
+}
+
+[data-bs-theme='dark'] .btn-outline-secondary {
+  --bs-btn-color: var(--spv-muted);
+  --bs-btn-border-color: var(--spv-border-strong);
+  --bs-btn-hover-color: var(--spv-ink);
+  --bs-btn-hover-bg: var(--spv-surface-3);
+  --bs-btn-hover-border-color: var(--spv-border-strong);
+  --bs-btn-active-color: var(--spv-ink);
+  --bs-btn-active-bg: var(--spv-surface-3);
+  --bs-btn-active-border-color: var(--spv-border-strong);
+}
+
+[data-bs-theme='dark'] .btn-link {
+  --bs-btn-color: var(--bs-link-color);
+  --bs-btn-hover-color: var(--bs-link-hover-color);
+}
+
+/* ---------- Formulários ---------- */
+
+[data-bs-theme='dark'] .form-control,
+[data-bs-theme='dark'] .form-select,
+[data-bs-theme='dark'] .input-group-text {
+  background-color: rgba(7, 11, 22, 0.55);
+  border-color: var(--spv-border-strong);
+  color: var(--spv-ink);
+}
+
+[data-bs-theme='dark'] .input-group-text {
+  color: var(--spv-muted);
+}
+
+[data-bs-theme='dark'] .form-control:disabled,
+[data-bs-theme='dark'] .form-select:disabled {
+  background-color: var(--spv-surface-2);
+  opacity: 0.7;
+}
+
+.form-control::placeholder {
+  color: var(--spv-muted);
+  opacity: 0.75;
 }
 
 .form-control:focus,
@@ -94,12 +292,71 @@ body {
   box-shadow: 0 0 0 0.2rem var(--bs-focus-ring-color);
 }
 
+/* Ícone do calendário dos campos de data visível no escuro */
+[data-bs-theme='dark'] input[type='date'],
+[data-bs-theme='dark'] input[type='month'],
+[data-bs-theme='dark'] input[type='datetime-local'] {
+  color-scheme: dark;
+}
+
+.form-check-input:checked {
+  background-color: var(--spv-sky);
+  border-color: var(--spv-sky);
+}
+
 .form-label {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--spv-muted);
+}
+
+/* ---------- Textos, selos e fundos neutros ---------- */
+
+[data-bs-theme='dark'] .text-secondary,
+[data-bs-theme='dark'] .text-muted,
+[data-bs-theme='dark'] .text-body-secondary {
+  color: var(--spv-muted) !important;
+}
+
+[data-bs-theme='dark'] .text-danger {
+  color: var(--spv-texto-perigo) !important;
+}
+
+[data-bs-theme='dark'] .text-success {
+  color: var(--spv-texto-sucesso) !important;
+}
+
+[data-bs-theme='dark'] .text-warning {
+  color: var(--spv-texto-atencao) !important;
+}
+
+[data-bs-theme='dark'] .text-primary {
+  color: #6cbcff !important;
+}
+
+/* Cores claras da marca: texto escuro por cima */
+.text-bg-success,
+.badge.bg-success,
+[data-bs-theme='dark'] .text-bg-primary,
+[data-bs-theme='dark'] .badge.bg-primary {
+  color: var(--spv-on-accent) !important;
+}
+
+[data-bs-theme='dark'] .bg-light,
+[data-bs-theme='dark'] .text-bg-light {
+  background-color: var(--spv-surface-2) !important;
+  color: var(--spv-ink) !important;
+}
+
+[data-bs-theme='dark'] .text-bg-secondary {
+  background-color: #475569 !important;
+}
+
+.badge {
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .spv-avatar {
@@ -107,53 +364,124 @@ body {
   place-items: center;
   width: 2.1rem;
   height: 2.1rem;
-  border-radius: 50%;
-  background: var(--spv-primary-soft);
-  color: var(--spv-primary);
-  font-weight: 700;
+  border-radius: 0.7rem;
+  background: var(--spv-gradiente);
+  color: var(--spv-on-accent);
+  font-weight: 800;
   font-size: 0.85rem;
   flex-shrink: 0;
 }
 
-/* Cartão padrão das telas (borda azul como no protótipo) */
+/* ---------- Componentes do Bootstrap no escuro ---------- */
+
+[data-bs-theme='dark'] .modal {
+  --bs-modal-bg: var(--spv-surface);
+  --bs-modal-border-color: var(--spv-border-strong);
+  --bs-modal-header-border-color: var(--spv-border);
+  --bs-modal-footer-border-color: var(--spv-border);
+  --bs-modal-border-radius: var(--spv-raio);
+}
+
+[data-bs-theme='dark'] .modal-backdrop {
+  --bs-backdrop-bg: #02040a;
+  --bs-backdrop-opacity: 0.72;
+}
+
+[data-bs-theme='dark'] .modal-content {
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
+}
+
+[data-bs-theme='dark'] .dropdown-menu {
+  --bs-dropdown-bg: var(--spv-surface-2);
+  --bs-dropdown-border-color: var(--spv-border-strong);
+  --bs-dropdown-link-color: var(--spv-ink);
+  --bs-dropdown-link-hover-bg: var(--spv-surface-3);
+  --bs-dropdown-link-hover-color: #fff;
+  --bs-dropdown-link-active-bg: var(--spv-primary-soft);
+  --bs-dropdown-link-active-color: var(--spv-primary);
+  --bs-dropdown-divider-bg: var(--spv-border);
+  box-shadow: var(--spv-sombra);
+}
+
+[data-bs-theme='dark'] .list-group {
+  --bs-list-group-bg: transparent;
+  --bs-list-group-border-color: var(--spv-border);
+  --bs-list-group-action-hover-bg: var(--spv-surface-2);
+  --bs-list-group-action-active-bg: var(--spv-surface-3);
+  --bs-list-group-active-bg: var(--spv-primary-soft);
+  --bs-list-group-active-color: var(--spv-primary);
+  --bs-list-group-active-border-color: var(--bs-primary-border-subtle);
+}
+
+[data-bs-theme='dark'] .toast {
+  --bs-toast-bg: var(--spv-surface-2);
+  --bs-toast-border-color: var(--spv-border-strong);
+  --bs-toast-header-bg: var(--spv-surface-3);
+  --bs-toast-header-color: var(--spv-ink);
+}
+
+[data-bs-theme='dark'] .alert {
+  --bs-alert-border-radius: var(--spv-raio-sm);
+}
+
+/* Abas (ex.: Dashboard "Visão geral | Power BI") viram um seletor em pílula */
+.nav-tabs {
+  --bs-nav-tabs-border-width: 0;
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--spv-surface);
+  border: 1px solid var(--spv-border);
+  border-radius: 0.8rem;
+}
+
+.nav-tabs .nav-link {
+  border: 0;
+  border-radius: 0.6rem;
+  color: var(--spv-muted);
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.4rem 0.9rem;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--spv-ink);
+  background: var(--spv-surface-2);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--spv-on-accent);
+  background: var(--spv-gradiente);
+}
+
+[data-bs-theme='dark'] .progress {
+  --bs-progress-bg: var(--spv-surface-3);
+}
+
+[data-bs-theme='dark'] .placeholder {
+  background-color: var(--spv-surface-3);
+}
+
+/* ---------- Cartões ---------- */
+
+/* Cartão padrão das telas */
 .spv-card {
   background: var(--spv-surface);
   border: 1px solid var(--spv-border);
-  border-radius: 0.75rem;
+  border-radius: var(--spv-raio);
+  box-shadow: var(--spv-sombra);
+}
+
+[data-bs-theme='dark'] .spv-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 40%), var(--spv-surface);
 }
 
 .spv-card-accent {
-  border-color: var(--spv-sky);
-}
-
-/* ---------- Ajustes de contraste ---------- */
-
-/* Emerald é claro: selos e fundos "success" usam texto escuro */
-.text-bg-success,
-.badge.bg-success {
-  color: var(--spv-ink) !important;
-}
-
-/* ---------- Tabelas e listas ---------- */
-
-.spv-tabela {
-  margin-bottom: 0;
-  font-size: 0.875rem;
-}
-
-.spv-tabela thead th {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--spv-muted);
-  background: var(--spv-surface);
-  border-bottom-width: 1px;
-  white-space: nowrap;
-}
-
-.spv-tabela td {
-  vertical-align: middle;
+  border-color: rgba(61, 167, 253, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(61, 167, 253, 0.12),
+    var(--spv-sombra);
 }
 
 .spv-card-header {
@@ -161,7 +489,7 @@ body {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.85rem 1.1rem;
+  padding: 0.9rem 1.15rem;
   border-bottom: 1px solid var(--spv-border);
 }
 
@@ -171,22 +499,133 @@ body {
   margin: 0;
 }
 
+.spv-card-header > .bi:first-child {
+  display: inline-grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.55rem;
+  background: var(--spv-primary-soft);
+  color: var(--spv-primary) !important;
+  font-size: 0.95rem;
+}
+
 .spv-card-body {
-  padding: 1.1rem;
+  padding: 1.15rem;
 }
 
 .spv-total {
   font-size: 1.5rem;
   font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .spv-dado-rotulo {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--spv-muted);
   margin-bottom: 0.15rem;
+}
+
+/*
+ * Cartões de indicador (dashboard, financeiro, estoque, entregas, pendentes, cliente).
+ * Visual v2: sem a borda colorida da esquerda; a cor do indicador (--cor) vira uma linha
+ * fina no topo e um brilho suave no canto.
+ */
+.spv-fin-card,
+.spv-estoque-resumo,
+.spv-entregas-resumo,
+.spv-contador,
+.spv-resumo-cliente {
+  position: relative;
+  overflow: hidden;
+  border-left: 1px solid var(--spv-border) !important;
+  border-radius: var(--spv-raio) !important;
+  box-shadow: var(--spv-sombra);
+}
+
+.spv-fin-card::before,
+.spv-estoque-resumo::before,
+.spv-entregas-resumo::before,
+.spv-contador::before,
+.spv-resumo-cliente::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cor, var(--spv-sky)), transparent 85%);
+}
+
+[data-bs-theme='dark'] .spv-fin-card::after,
+[data-bs-theme='dark'] .spv-estoque-resumo::after,
+[data-bs-theme='dark'] .spv-entregas-resumo::after,
+[data-bs-theme='dark'] .spv-contador::after,
+[data-bs-theme='dark'] .spv-resumo-cliente::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 60%;
+  height: 120%;
+  background: radial-gradient(closest-side, var(--cor, var(--spv-sky)), transparent);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+button.spv-fin-card,
+button.spv-contador {
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+button.spv-fin-card:hover,
+button.spv-contador:hover {
+  transform: translateY(-2px);
+}
+
+/* ---------- Tabelas e listas ---------- */
+
+[data-bs-theme='dark'] .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--spv-ink);
+  --bs-table-border-color: var(--spv-border);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+  --bs-table-hover-bg: rgba(61, 167, 253, 0.06);
+  --bs-table-hover-color: #fff;
+  --bs-table-active-bg: rgba(61, 167, 253, 0.1);
+}
+
+[data-bs-theme='dark'] .table-light,
+[data-bs-theme='dark'] .table > thead.table-light > tr > th {
+  --bs-table-bg: var(--spv-surface-2);
+  --bs-table-color: var(--spv-muted);
+}
+
+.spv-tabela {
+  margin-bottom: 0;
+  font-size: 0.875rem;
+}
+
+.spv-tabela thead th {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--spv-muted);
+  background: var(--spv-surface-2);
+  border-bottom-width: 1px;
+  white-space: nowrap;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.spv-tabela td {
+  vertical-align: middle;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
 }
 
 /* ---------- Impressão (REQ008) ---------- */
@@ -197,7 +636,8 @@ body {
 
 @media print {
   body {
-    background: #fff;
+    background: #fff !important;
+    color: #000;
   }
 
   .spv-sidebar,
@@ -207,8 +647,19 @@ body {
     display: none !important;
   }
 
+  .spv-main {
+    margin-left: 0 !important;
+  }
+
   .spv-content {
     padding: 0 !important;
+  }
+
+  .spv-card,
+  .spv-fin-card,
+  .spv-estoque-resumo,
+  .spv-entregas-resumo {
+    box-shadow: none !important;
   }
 
   .spv-somente-impressao {

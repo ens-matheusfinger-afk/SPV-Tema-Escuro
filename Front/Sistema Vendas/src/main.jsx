@@ -4,11 +4,17 @@ import { BrowserRouter } from 'react-router-dom'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+// Fontes do tema v2 (instaladas pelo npm, funcionam sem internet)
+import '@fontsource-variable/plus-jakarta-sans'
+import '@fontsource-variable/jetbrains-mono'
 import './index.css'
 
 import { AuthProvider } from './context/AuthProvider'
 import { NotificacaoProvider } from './context/NotificacaoProvider'
+import { ativarTemaImpressao } from './utils/temaImpressao'
 import App from './App.jsx'
+
+ativarTemaImpressao()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

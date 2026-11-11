@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-bs-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f1f4f8" />
+    <meta name="theme-color" content="#070b16" />
     <title>SYS VENDAS</title>
     <!--
       Tela de carregamento (splash): aparece na hora em que a página abre, antes do React.
@@ -15,7 +15,7 @@
       html,
       body {
         margin: 0;
-        background: #f1f4f8;
+        background: #070b16;
       }
 
       #spv-splash {
@@ -27,7 +27,9 @@
         align-items: center;
         justify-content: center;
         gap: 1.4rem;
-        background: radial-gradient(circle at 50% 42%, #e8f4ff 0%, #f1f4f8 55%, #e9eef5 100%);
+        background:
+          radial-gradient(circle at 50% 40%, rgba(61, 167, 253, 0.16) 0%, transparent 45%),
+          radial-gradient(circle at 50% 60%, rgba(6, 214, 160, 0.08) 0%, transparent 55%), #070b16;
         font-family:
           system-ui,
           -apple-system,
@@ -79,17 +81,18 @@
         position: absolute;
         inset: 0;
         border-radius: 50%;
-        border: 6px solid rgba(61, 167, 253, 0.12);
+        border: 6px solid rgba(61, 167, 253, 0.1);
       }
 
       .spv-splash-logo {
         width: 100px;
         height: 100px;
-        border-radius: 50%;
-        background: #fff;
+        border-radius: 28px;
+        background: #0f1626;
+        border: 1px solid rgba(148, 163, 184, 0.18);
         display: grid;
         place-items: center;
-        box-shadow: 0 8px 24px rgba(15, 120, 204, 0.15);
+        box-shadow: 0 0 40px rgba(61, 167, 253, 0.25);
         animation: spv-pulsar 1.6s ease-in-out infinite;
       }
 
@@ -102,17 +105,17 @@
         display: block;
         font-size: 1.35rem;
         letter-spacing: 0.04em;
-        color: #1e293b;
+        color: #e7ecf5;
       }
 
       .spv-splash-nome span {
         font-size: 0.85rem;
-        color: #64748b;
+        color: #8d99b0;
       }
 
       .spv-splash-texto {
         font-size: 0.8rem;
-        color: #64748b;
+        color: #8d99b0;
       }
 
       .spv-splash-texto::after {
@@ -173,7 +176,7 @@
             <rect x="25" y="30" width="14" height="18" rx="2.5" fill="#06D6A0" />
             <path
               d="M28.5 36h7M28.5 40h7M28.5 44h5"
-              stroke="#fff"
+              stroke="#04121f"
               stroke-width="1.8"
               stroke-linecap="round"
             />
