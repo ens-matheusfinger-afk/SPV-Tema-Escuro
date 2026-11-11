@@ -1,21 +1,35 @@
-/* Menu lateral (no desktop fica fixo; abaixo de lg vira gaveta/Offcanvas) */
+/*
+ * Menu lateral (visual v2).
+ * Desktop: painel flutuante com cantos arredondados, que recolhe para uma "trilha" de ícones.
+ * Abaixo de lg: gaveta (Offcanvas) de altura total.
+ */
 
-/* Sidebar: no desktop fica fixa; abaixo de lg vira gaveta (Offcanvas) */
 .spv-sidebar.offcanvas-lg {
   --bs-offcanvas-width: var(--spv-sidebar-width);
+  --bs-offcanvas-bg: var(--spv-surface);
   background: var(--spv-surface);
   border-right: 1px solid var(--spv-border);
 }
 
 @media (min-width: 992px) {
   .spv-sidebar.offcanvas-lg {
-    /* o Bootstrap força fundo transparente no offcanvas-lg; aqui a sidebar volta a ser branca */
-    background-color: var(--spv-surface) !important;
+    /* o Bootstrap força fundo transparente no offcanvas-lg; aqui o painel ganha fundo próprio */
+    background:
+      linear-gradient(180deg, rgba(61, 167, 253, 0.06), transparent 30%), var(--spv-surface) !important;
     width: var(--spv-sidebar-width);
     flex-shrink: 0;
     position: sticky;
-    top: 0;
-    height: 100vh;
+    top: 0.75rem;
+    height: calc(100vh - 1.5rem);
+    margin: 0.75rem 0 0.75rem 0.75rem;
+    border: 1px solid var(--spv-border);
+    border-radius: 1.1rem;
+    box-shadow: var(--spv-sombra);
+    transition: width 0.2s ease;
+  }
+
+  .spv-recolhido .spv-sidebar.offcanvas-lg {
+    width: var(--spv-sidebar-rail);
   }
 }
 
@@ -24,60 +38,106 @@
   flex-direction: column;
   padding: 0;
   height: 100%;
+  overflow: hidden;
 }
+
+/* ---------- Marca ---------- */
 
 .spv-brand {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 1rem 1.1rem;
-  border-bottom: 1px solid var(--spv-border);
+  gap: 0.7rem;
+  padding: 1.1rem 1rem 0.9rem;
+}
+
+.spv-brand-logo {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.8rem;
+  background: var(--spv-surface-2);
+  border: 1px solid var(--spv-border-strong);
+  box-shadow: 0 0 22px -6px rgba(61, 167, 253, 0.55);
 }
 
 .spv-brand-name {
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   line-height: 1.1;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
+  background: var(--spv-gradiente);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .spv-brand-sub {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--spv-muted);
+  white-space: nowrap;
 }
+
+/* ---------- Navegação ---------- */
 
 .spv-nav {
   flex: 1;
   overflow-y: auto;
-  padding: 0.75rem 0.6rem;
+  overflow-x: hidden;
+  padding: 0.25rem 0.75rem 0.75rem;
+}
+
+.spv-nav-titulo {
+  padding: 0.6rem 0.75rem 0.35rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--spv-muted);
+  opacity: 0.8;
 }
 
 .spv-nav-link,
 .spv-nav-group {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.7rem;
   width: 100%;
-  padding: 0.5rem 0.7rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.75rem;
+  margin-bottom: 2px;
   border: 0;
-  border-radius: 0.45rem;
+  border-radius: 0.7rem;
   background: none;
-  color: var(--spv-ink);
+  color: var(--spv-muted);
   font-size: 0.875rem;
+  font-weight: 500;
   text-align: left;
   text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .spv-nav-link:hover,
 .spv-nav-group:hover {
-  background: var(--spv-bg);
+  background: var(--spv-surface-2);
   color: var(--spv-ink);
 }
 
 .spv-nav-link i,
 .spv-nav-group i {
-  font-size: 1rem;
-  color: var(--spv-muted);
+  flex-shrink: 0;
+  width: 1.25rem;
+  text-align: center;
+  font-size: 1.05rem;
+}
+
+.spv-nav-group.tem-ativo {
+  color: var(--spv-ink);
 }
 
 .spv-nav-group .spv-chevron {
@@ -90,51 +150,143 @@
   transform: rotate(180deg);
 }
 
+/* Subitens com uma linha-guia vertical à esquerda */
 .spv-nav-sub {
-  padding-left: 1.1rem;
+  position: relative;
+  margin-left: 1.35rem;
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--spv-border-strong);
 }
 
 .spv-nav-sub .spv-nav-link {
+  min-height: 2.2rem;
   font-size: 0.83rem;
-  padding: 0.4rem 0.7rem;
+  padding: 0.35rem 0.65rem;
 }
 
+.spv-nav-sub .spv-nav-link i {
+  font-size: 0.9rem;
+}
+
+/* Item ativo: pílula em degradê da marca, texto escuro */
 .spv-nav-link.active {
-  background: var(--spv-primary-soft);
-  color: var(--spv-primary);
-  font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--spv-sky);
+  background: var(--spv-gradiente);
+  color: var(--spv-on-accent);
+  font-weight: 700;
+  box-shadow: 0 8px 20px -10px rgba(61, 167, 253, 0.8);
 }
 
-.spv-nav-link.active i {
-  color: var(--spv-primary);
+.spv-nav-link.active:hover {
+  color: var(--spv-on-accent);
+  filter: brightness(1.06);
 }
 
-.spv-user {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.85rem 1.1rem;
+/* Selos de aviso (estoque mínimo, contas vencendo) */
+.spv-nav-selo {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.35rem;
+  margin-left: auto;
+  border-radius: 1rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.spv-nav-group .spv-nav-selo + .spv-chevron,
+.spv-nav-group span:has(.spv-nav-selo) + .spv-chevron {
+  margin-left: 0.4rem;
+}
+
+.spv-nav-group > span:has(.spv-nav-selo) {
+  margin-left: auto;
+}
+
+/* espaços reservados para selos que não têm aviso: não ocupam lugar */
+.spv-nav-group > span:empty {
+  display: none;
+}
+
+.spv-nav-selo-warning {
+  background: rgba(251, 191, 36, 0.18);
+  color: var(--spv-texto-atencao);
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.35);
+}
+
+.spv-nav-selo-danger {
+  background: rgba(248, 113, 113, 0.18);
+  color: var(--spv-texto-perigo);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.4);
+}
+
+.spv-nav-link.active .spv-nav-selo {
+  background: rgba(4, 18, 31, 0.2);
+  color: var(--spv-on-accent);
+  box-shadow: none;
+}
+
+/* ---------- Rodapé (botão recolher) ---------- */
+
+.spv-sidebar-rodape {
+  padding: 0.6rem 0.75rem 0.75rem;
   border-top: 1px solid var(--spv-border);
 }
 
-/* ---------- Rodapé da sidebar (link para Meu usuário) ---------- */
-
-.spv-user-link {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  min-width: 0;
-  flex: 1;
-  padding: 0.25rem;
-  margin: -0.25rem;
-  border-radius: 0.5rem;
-  color: inherit;
-  text-decoration: none;
+.spv-recolher {
+  font-size: 0.8rem;
 }
 
-.spv-user-link:hover,
-.spv-user-link.active {
-  background: var(--spv-bg);
-  color: inherit;
+/* ---------- Menu recolhido (só ícones) — apenas no desktop ---------- */
+
+@media (min-width: 992px) {
+  .spv-recolhido .spv-nav-texto,
+  .spv-recolhido .spv-chevron {
+    display: none;
+  }
+
+  .spv-recolhido .spv-brand {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .spv-recolhido .spv-nav {
+    padding-inline: 0.65rem;
+  }
+
+  .spv-recolhido .spv-nav-link,
+  .spv-recolhido .spv-nav-group {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  /* No modo ícone o grupo que contém a tela atual fica marcado */
+  .spv-recolhido .spv-nav-group.tem-ativo {
+    background: var(--spv-primary-soft);
+    color: var(--spv-primary);
+  }
+
+  /* Selo vira uma bolinha no canto do ícone */
+  .spv-recolhido .spv-nav-selo {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.45rem;
+    min-width: 0.55rem;
+    width: 0.55rem;
+    height: 0.55rem;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .spv-recolhido .spv-nav-selo-warning {
+    background: var(--spv-cor-atencao);
+  }
+
+  .spv-recolhido .spv-nav-selo-danger {
+    background: var(--spv-cor-saida);
+  }
+
+  .spv-recolhido .spv-sidebar-rodape {
+    padding-inline: 0.65rem;
+  }
 }

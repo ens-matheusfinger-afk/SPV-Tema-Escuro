@@ -11,7 +11,7 @@ export default function Logo({ tamanho = 36 }) {
       <rect x="25" y="30" width="14" height="18" rx="2.5" fill="#06D6A0" />
       <path
         d="M28.5 36h7M28.5 40h7M28.5 44h5"
-        stroke="#fff"
+        stroke="#04121f"
         strokeWidth="1.8"
         strokeLinecap="round"
       />

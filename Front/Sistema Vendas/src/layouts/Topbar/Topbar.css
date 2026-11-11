@@ -1,29 +1,169 @@
-/* Barra superior com a trilha de navegação */
+/* Barra superior (visual v2): transparente com desfoque, trilha + data + menu do usuário */
 
 .spv-topbar {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  min-height: 3.5rem;
-  padding: 0.5rem 1.5rem;
-  background: var(--spv-surface);
-  border-bottom: 1px solid var(--spv-border);
+  min-height: 4.25rem;
+  padding: 0.75rem 1.75rem;
   position: sticky;
   top: 0;
   z-index: 10;
+  background: color-mix(in srgb, var(--spv-bg) 72%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 @media (max-width: 575.98px) {
   .spv-topbar {
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1rem;
   }
 }
 
+.spv-topbar-icone {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 0.75rem;
+  background: var(--spv-surface);
+  border: 1px solid var(--spv-border);
+  color: var(--spv-ink);
+  font-size: 1.25rem;
+}
+
+.spv-topbar-icone:hover {
+  background: var(--spv-surface-2);
+  color: #fff;
+}
+
+/* ---------- Trilha ---------- */
+
 .spv-breadcrumb {
-  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  font-size: 0.85rem;
   color: var(--spv-muted);
+}
+
+.spv-breadcrumb .bi {
+  font-size: 0.65rem;
+  opacity: 0.7;
 }
 
 .spv-breadcrumb strong {
   color: var(--spv-ink);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 575.98px) {
+  .spv-breadcrumb-grupo,
+  .spv-breadcrumb .bi {
+    display: none;
+  }
+}
+
+/* ---------- Lado direito ---------- */
+
+.spv-topbar-direita {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.spv-topbar-data {
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--spv-border);
+  border-radius: 2rem;
+  background: var(--spv-surface);
+  color: var(--spv-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.spv-topbar-data::first-letter {
+  text-transform: uppercase;
+}
+
+/* Botão do usuário (abre o menu com "Meu usuário" e "Sair") */
+.spv-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.3rem 0.65rem 0.3rem 0.3rem;
+  border: 1px solid var(--spv-border);
+  border-radius: 0.9rem;
+  background: var(--spv-surface);
+  color: var(--spv-ink);
+  text-align: left;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.spv-usuario:hover,
+.spv-usuario[aria-expanded='true'] {
+  background: var(--spv-surface-2);
+  border-color: var(--spv-border-strong);
+}
+
+/* tira a setinha padrão do Dropdown do Bootstrap (usamos o ícone próprio) */
+.spv-usuario.dropdown-toggle::after {
+  display: none;
+}
+
+.spv-usuario-dados {
+  line-height: 1.15;
+  max-width: 11rem;
+}
+
+.spv-usuario-nome,
+.spv-usuario-perfil {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spv-usuario-nome {
+  font-size: 0.83rem;
+  font-weight: 700;
+}
+
+.spv-usuario-perfil {
+  font-size: 0.7rem;
+  color: var(--spv-muted);
+}
+
+.spv-usuario-seta {
+  font-size: 0.7rem;
+  color: var(--spv-muted);
+}
+
+.spv-usuario-menu {
+  min-width: 13rem;
+  padding: 0.4rem;
+  border-radius: 0.8rem;
+}
+
+.spv-usuario-menu .dropdown-item {
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.875rem;
+}
+
+.spv-usuario-menu-topo {
+  padding: 0.4rem 0.7rem 0.6rem;
+  margin-bottom: 0.3rem;
+  border-bottom: 1px solid var(--spv-border);
 }

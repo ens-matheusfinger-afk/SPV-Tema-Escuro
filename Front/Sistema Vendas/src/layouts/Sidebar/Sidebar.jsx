@@ -6,13 +6,17 @@ import { useAlertasEstoque } from '../../hooks/useAlertasEstoque'
 import { useAlertasContasPagar } from '../../hooks/useAlertasContasPagar'
 import { MENU } from '../../routes/rotas'
 import { TELAS } from '../../utils/constants'
-import { iniciais } from '../../utils/formatters'
 import Logo from '../../components/Logo/Logo'
 import './Sidebar.css'
 
-// No desktop (lg+) fica fixo na lateral; no celular vira uma gaveta (REQ032)
-export default function Sidebar({ aberto, aoFechar }) {
-  const { usuario, podeAcessar, logout } = useAuth()
+/*
+ * Menu lateral (REQ031/REQ032).
+ * Desktop (lg+): painel flutuante fixo, que pode ser recolhido para mostrar só os ícones.
+ * Celular: vira uma gaveta (Offcanvas).
+ * Os dados do usuário e o botão "Sair" ficam na barra superior (Topbar).
+ */
+export default function Sidebar({ aberto, aoFechar, recolhido, aoAlternarRecolhido, aoExpandir }) {
+  const { podeAcessar } = useAuth()
   const { pathname } = useLocation()
   // SPV-108: número de produtos no estoque mínimo ao lado de "Estoque"
   const alertasEstoque = useAlertasEstoque(podeAcessar(TELAS.ESTOQUE), pathname)
@@ -33,7 +37,7 @@ export default function Sidebar({ aberto, aoFechar }) {
   const selo = (aviso) =>
     aviso?.n > 0 && (
       <span
-        className={`badge rounded-pill text-bg-${aviso.cor} ms-auto`}
+        className={`spv-nav-selo spv-nav-selo-${aviso.cor}`}
         title={`${aviso.n} ${aviso.titulo}`}
       >
         {aviso.n}
@@ -50,23 +54,31 @@ export default function Sidebar({ aberto, aoFechar }) {
     menu.filter((g) => g.itens?.some((sub) => pathname.startsWith(sub.path))).map((g) => g.label),
   )
 
-  const alternarGrupo = (label) =>
+  const alternarGrupo = (label) => {
+    // Menu recolhido: clicar no ícone do grupo abre o menu inteiro já com o grupo aberto
+    if (recolhido) {
+      aoExpandir()
+      setGruposAbertos((atual) => (atual.includes(label) ? atual : [...atual, label]))
+      return
+    }
     setGruposAbertos((atual) =>
       atual.includes(label) ? atual.filter((l) => l !== label) : [...atual, label],
     )
+  }
 
   const link = (item) => (
     <NavLink
       key={item.path}
       to={item.path}
       end
+      title={recolhido ? item.label : undefined}
       className={({ isActive }) =>
         `spv-nav-link${isActive || item.ativoEm?.test(pathname) ? ' active' : ''}`
       }
       onClick={aoFechar}
     >
       <i className={`bi ${item.icone}`} aria-hidden="true"></i>
-      {item.label}
+      <span className="spv-nav-texto">{item.label}</span>
       {selo(avisos[item.path])}
     </NavLink>
   )
@@ -75,10 +87,12 @@ export default function Sidebar({ aberto, aoFechar }) {
     <Offcanvas show={aberto} onHide={aoFechar} responsive="lg" className="spv-sidebar">
       <Offcanvas.Body>
         <div className="spv-brand">
-          <Logo />
-          <div>
+          <span className="spv-brand-logo">
+            <Logo tamanho={30} />
+          </span>
+          <div className="spv-nav-texto">
             <div className="spv-brand-name">SYS VENDAS</div>
-            <div className="spv-brand-sub">Sistema de Pedidos</div>
+            <div className="spv-brand-sub">Pedidos · Produção · Caixa</div>
           </div>
           <button
             type="button"
@@ -89,28 +103,33 @@ export default function Sidebar({ aberto, aoFechar }) {
         </div>
 
         <nav className="spv-nav" aria-label="Menu principal">
+          <div className="spv-nav-titulo spv-nav-texto">Menu</div>
           {menu.map((item) => {
             if (!item.itens) return link(item)
 
-            const aberto = gruposAbertos.includes(item.label)
+            const grupoAberto = !recolhido && gruposAbertos.includes(item.label)
+            const grupoAtivo = item.itens.some(
+              (sub) => pathname === sub.path || sub.ativoEm?.test(pathname),
+            )
             const idSub = `menu-${item.label}`
             return (
               <div key={item.label}>
                 <button
                   type="button"
-                  className="spv-nav-group"
-                  aria-expanded={aberto}
+                  className={`spv-nav-group${grupoAtivo ? ' tem-ativo' : ''}`}
+                  aria-expanded={grupoAberto}
                   aria-controls={idSub}
+                  title={recolhido ? item.label : undefined}
                   onClick={() => alternarGrupo(item.label)}
                 >
                   <i className={`bi ${item.icone}`} aria-hidden="true"></i>
-                  {item.label}
+                  <span className="spv-nav-texto">{item.label}</span>
                   {/* grupo fechado: mostra o aviso dos itens de dentro */}
-                  {!aberto &&
+                  {!grupoAberto &&
                     item.itens.map((sub) => <span key={sub.path}>{selo(avisos[sub.path])}</span>)}
                   <i className="bi bi-chevron-down spv-chevron" aria-hidden="true"></i>
                 </button>
-                <Collapse in={aberto}>
+                <Collapse in={grupoAberto}>
                   <div id={idSub}>
                     <div className="spv-nav-sub">{item.itens.map(link)}</div>
                   </div>
@@ -120,29 +139,19 @@ export default function Sidebar({ aberto, aoFechar }) {
           })}
         </nav>
 
-        <div className="spv-user">
-          <NavLink
-            to="/meu-usuario"
-            className="spv-user-link"
-            title="Meu usuário: dados e senha"
-            onClick={aoFechar}
-          >
-            <div className="spv-avatar">{iniciais(usuario.nome)}</div>
-            <div className="lh-sm" style={{ minWidth: 0 }}>
-              <div className="fw-semibold small text-truncate">{usuario.nome}</div>
-              <div className="text-secondary text-truncate" style={{ fontSize: '0.75rem' }}>
-                {usuario.perfilNome}
-              </div>
-            </div>
-          </NavLink>
+        <div className="spv-sidebar-rodape d-none d-lg-block">
           <button
             type="button"
-            className="btn btn-sm btn-link text-secondary ms-auto"
-            title="Sair"
-            aria-label="Sair do sistema"
-            onClick={() => logout('', true)}
+            className="spv-nav-link spv-recolher"
+            onClick={aoAlternarRecolhido}
+            title={recolhido ? 'Expandir menu' : 'Recolher menu'}
+            aria-label={recolhido ? 'Expandir menu' : 'Recolher menu'}
           >
-            <i className="bi bi-box-arrow-right fs-5"></i>
+            <i
+              className={`bi ${recolhido ? 'bi-layout-sidebar' : 'bi-layout-sidebar-inset'}`}
+              aria-hidden="true"
+            ></i>
+            <span className="spv-nav-texto">Recolher menu</span>
           </button>
         </div>
       </Offcanvas.Body>

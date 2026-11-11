@@ -1,0 +1,22 @@
+/* Cabeçalho das telas (visual v2): título grande, subtítulo discreto */
+.spv-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.spv-page-header h1 {
+  font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.25rem;
+}
+
+.spv-page-header p {
+  color: var(--spv-muted);
+  margin: 0;
+  max-width: 46rem;
+}
