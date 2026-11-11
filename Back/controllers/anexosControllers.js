@@ -51,6 +51,37 @@ const nomeOriginal = (file) => Buffer.from(file.originalname, 'latin1').toString
 const apagarArquivos = (files = []) =>
   files.forEach((f) => fs.unlink(f.path, () => {}));
 
+/*
+ * Confere o CONTEÚDO do arquivo, não só o nome/extensão: lê os primeiros bytes ("assinatura")
+ * e vê se batem com o tipo declarado. Assim um .exe renomeado para .pdf ou .jpg é recusado.
+ */
+const ASSINATURAS = {
+  'image/jpeg': (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff,
+  'image/png': (b) => b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])),
+  'image/gif': (b) => b.subarray(0, 4).toString('latin1') === 'GIF8',
+  'image/webp': (b) => b.subarray(0, 4).toString('latin1') === 'RIFF' && b.subarray(8, 12).toString('latin1') === 'WEBP',
+  'application/pdf': (b) => b.subarray(0, 5).toString('latin1') === '%PDF-',
+  // .docx/.xlsx são pacotes ZIP; .doc/.xls são do formato antigo do Office (OLE)
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': (b) => b.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04])),
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': (b) => b.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04])),
+  'application/msword': (b) => b.subarray(0, 4).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0])),
+  'application/vnd.ms-excel': (b) => b.subarray(0, 4).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0])),
+  // texto: não pode ter bytes nulos (sinal de arquivo binário)
+  'text/plain': (b) => !b.includes(0x00),
+};
+
+function conteudoConfere(file) {
+  const bytes = Buffer.alloc(512);
+  const fd = fs.openSync(file.path, 'r');
+  const lidos = fs.readSync(fd, bytes, 0, 512, 0);
+  fs.closeSync(fd);
+  const inicio = bytes.subarray(0, lidos);
+  if (inicio.subarray(0, 2).toString('latin1') === 'MZ') return false; // programa do Windows (.exe/.dll)
+  if (inicio.subarray(0, 4).equals(Buffer.from([0x7f, 0x45, 0x4c, 0x46]))) return false; // programa Linux (ELF)
+  const confere = ASSINATURAS[file.mimetype];
+  return Boolean(confere && lidos > 0 && confere(inicio));
+}
+
 const MENSAGENS_MULTER = {
   LIMIT_FILE_SIZE: `Cada arquivo pode ter no máximo ${TAMANHO_MAXIMO_MB} MB.`,
   LIMIT_FILE_COUNT: `Envie no máximo ${MAXIMO_POR_ENVIO} arquivos por vez.`,
@@ -72,6 +103,13 @@ exports.enviar = (req, res) => {
 
       if (!req.files || req.files.length === 0) {
         return res.status(400).json({ erro: 'Escolha pelo menos um arquivo.' });
+      }
+      const falsos = req.files.filter((f) => !conteudoConfere(f));
+      if (falsos.length > 0) {
+        apagarArquivos(req.files);
+        return res.status(400).json({
+          erro: `O conteúdo de "${nomeOriginal(falsos[0])}" não confere com o tipo do arquivo (pode ser um programa ou arquivo renomeado). Envio bloqueado.`,
+        });
       }
       if (!idUsuario) {
         apagarArquivos(req.files);
