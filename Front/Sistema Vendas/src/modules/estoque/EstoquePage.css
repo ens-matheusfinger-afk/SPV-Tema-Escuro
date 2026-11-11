@@ -32,7 +32,7 @@
   position: relative;
   height: 6px;
   border-radius: 3px;
-  background: var(--spv-border);
+  background: var(--spv-surface-3);
 }
 
 .spv-ocupacao > span {
@@ -52,7 +52,7 @@
 }
 
 .spv-ocupacao-baixo {
-  --cor-ocupacao: #f5b400;
+  --cor-ocupacao: var(--spv-cor-atencao);
 }
 
 .spv-ocupacao-zerado {

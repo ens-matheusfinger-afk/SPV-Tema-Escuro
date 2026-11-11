@@ -82,7 +82,7 @@ export default function CaixaPage() {
           rotulo: 'Saídas do dia',
           icone: 'bi-arrow-up-circle',
           valor: r.saidas.total,
-          cor: '#f07167',
+          cor: 'var(--spv-cor-saida)',
           detalhe: `${formatarMoeda(r.saidas.dinheiro)} em dinheiro`,
           teste: 'saidas',
         },

@@ -125,7 +125,7 @@ export default function FinanceiroPage() {
       rotulo: `A pagar em ${DIAS_PREVISAO} dias`,
       valor: formatarMoeda(somaValores(pagar15)),
       detalhe: `${pagar15.length} conta(s)${pagarVencidas.length ? ` · + ${formatarMoeda(somaValores(pagarVencidas))} vencidas` : ''}`,
-      cor: '#f07167',
+      cor: 'var(--spv-cor-saida)',
       icone: 'bi-arrow-up-circle',
       teste: 'previsao-pagar',
     },
@@ -202,7 +202,7 @@ export default function FinanceiroPage() {
                     <>
                       <i
                         className="bi bi-circle-fill ms-3 me-1"
-                        style={{ color: '#f07167' }}
+                        style={{ color: 'var(--spv-cor-saida)' }}
                         aria-hidden="true"
                       ></i>
                       a pagar

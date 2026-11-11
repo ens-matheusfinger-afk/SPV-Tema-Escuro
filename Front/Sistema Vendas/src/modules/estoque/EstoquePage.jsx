@@ -126,7 +126,7 @@ export default function EstoquePage() {
                   rotulo: 'Em alerta (mínimo)',
                   valor: emAlerta.length,
                   icone: 'bi-exclamation-triangle',
-                  cor: '#f5b400',
+                  cor: 'var(--spv-cor-atencao)',
                   destaque: emAlerta.length > 0,
                 },
                 {
@@ -151,7 +151,7 @@ export default function EstoquePage() {
                     </div>
                     <div
                       className="spv-estoque-resumo-valor"
-                      style={c.destaque ? { color: '#8a6100' } : undefined}
+                      style={c.destaque ? { color: 'var(--spv-texto-atencao)' } : undefined}
                     >
                       {c.valor}
                     </div>

@@ -109,7 +109,7 @@ export default function ContasReceberPage() {
       chave: 'proximas',
       rotulo: `Próximos ${DIAS_PREVISAO} dias`,
       lista: lista.filter(FILTROS.proximas),
-      cor: '#f5b400',
+      cor: 'var(--spv-cor-atencao)',
       icone: 'bi-calendar-week',
     },
     {

@@ -160,7 +160,7 @@ export default function RetiradaPage() {
       rotulo: `Parados há ${DIAS_ATENCAO}+ dias`,
       valor: lista.filter(FILTROS.parados).length,
       detalhe: 'avisar o cliente',
-      cor: '#f5b400',
+      cor: 'var(--spv-cor-atencao)',
       icone: 'bi-hourglass-bottom',
     },
     {

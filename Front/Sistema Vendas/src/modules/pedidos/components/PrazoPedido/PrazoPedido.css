@@ -24,7 +24,7 @@
   min-width: 5.5rem;
   height: 4px;
   border-radius: 2px;
-  background: var(--spv-border);
+  background: var(--spv-surface-3);
   overflow: hidden;
 }
 
@@ -42,18 +42,18 @@
 
 /* Atenção: amarelo */
 .spv-prazo-atencao {
-  --cor-prazo: #f5b400;
+  --cor-prazo: var(--spv-cor-atencao);
 }
 .spv-prazo-atencao .spv-prazo-selo {
-  color: #8a6100;
+  color: var(--spv-texto-atencao);
 }
 
 /* Vence hoje: laranja */
 .spv-prazo-hoje {
-  --cor-prazo: #e8590c;
+  --cor-prazo: var(--spv-cor-laranja);
 }
 .spv-prazo-hoje .spv-prazo-selo {
-  color: #c2410c;
+  color: var(--spv-texto-laranja);
 }
 
 /* Atrasado: vermelho */
@@ -61,5 +61,5 @@
   --cor-prazo: var(--bs-danger);
 }
 .spv-prazo-atrasado .spv-prazo-selo {
-  color: var(--bs-danger);
+  color: var(--spv-texto-perigo);
 }

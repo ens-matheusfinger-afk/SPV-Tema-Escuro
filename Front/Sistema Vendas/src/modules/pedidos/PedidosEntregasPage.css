@@ -28,7 +28,7 @@
 
 /* Dia de hoje e bloco de atrasados ganham uma borda de destaque */
 .spv-dia-hoje {
-  border-left: 4px solid #f5b400;
+  border-left: 4px solid var(--spv-cor-atencao);
 }
 
 .spv-dia-atrasado {

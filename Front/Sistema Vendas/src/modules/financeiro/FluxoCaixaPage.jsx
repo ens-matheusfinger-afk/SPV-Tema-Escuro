@@ -94,7 +94,7 @@ export default function FluxoCaixaPage() {
           rotulo: 'Saldo anterior',
           valor: dados.saldoAnterior,
           detalhe: `antes de ${formatarDia(dados.de)}`,
-          cor: '#94a3b8',
+          cor: 'var(--spv-cor-neutra)',
           icone: 'bi-skip-backward',
         },
         {
@@ -108,7 +108,7 @@ export default function FluxoCaixaPage() {
           rotulo: 'Saídas',
           valor: t.saidas,
           detalhe: 'despesas e pagamentos',
-          cor: '#f07167',
+          cor: 'var(--spv-cor-saida)',
           icone: 'bi-arrow-up-circle',
         },
         {

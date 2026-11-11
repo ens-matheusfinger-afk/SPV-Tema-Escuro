@@ -13,9 +13,9 @@ import { STATUS_ABERTOS, STATUS_PEDIDO } from '../../utils/constants'
 import './PedidosPendentesPage.css'
 
 const CORES = {
-  secondary: '#94a3b8',
+  secondary: 'var(--spv-cor-neutra)',
   primary: 'var(--spv-sky)',
-  warning: '#f5b400',
+  warning: 'var(--spv-cor-atencao)',
   info: 'var(--spv-mint)',
 }
 
@@ -78,14 +78,14 @@ export default function PedidosPendentesPage() {
             <button
               type="button"
               className={`spv-contador ${filtro.status === 'vencendo' ? 'ativo' : ''}`}
-              style={{ '--cor': '#e8590c' }}
+              style={{ '--cor': 'var(--spv-cor-laranja)' }}
               aria-pressed={filtro.status === 'vencendo'}
               onClick={() => alternarStatus('vencendo')}
               title="Vencem hoje, amanhã ou já usaram 75% do prazo"
             >
               <div
                 className="spv-contador-numero"
-                style={vencendo ? { color: '#c2410c' } : undefined}
+                style={vencendo ? { color: 'var(--spv-texto-laranja)' } : undefined}
               >
                 {vencendo}
               </div>

@@ -9,19 +9,19 @@
 }
 
 .spv-situacao-quitada {
-  color: #0b8a5f;
+  color: var(--spv-texto-sucesso);
 }
 .spv-situacao-vencida {
-  color: var(--bs-danger);
+  color: var(--spv-texto-perigo);
 }
 .spv-situacao-pedido-atrasado {
-  color: #8a6100;
+  color: var(--spv-texto-atencao);
 }
 .spv-situacao-vence-hoje {
-  color: #c2410c;
+  color: var(--spv-texto-laranja);
 }
 .spv-situacao-vence-logo {
-  color: #b45309;
+  color: var(--spv-texto-atencao);
 }
 .spv-situacao-a-vencer,
 .spv-situacao-sem-vencimento {

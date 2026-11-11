@@ -38,7 +38,7 @@ button.spv-fin-card.ativo {
 
 .spv-baixa-resumo {
   padding: 0.75rem 1rem;
-  background: var(--spv-surface-2, #f4f8fc);
+  background: var(--spv-surface-2);
   border: 1px solid var(--spv-border);
   border-radius: 0.5rem;
 }
@@ -88,7 +88,7 @@ button.spv-fin-card.ativo {
 }
 
 .spv-previsao-saida > span {
-  background: #f07167;
+  background: var(--spv-cor-saida);
 }
 
 .spv-previsao-saldo {
@@ -121,7 +121,7 @@ button.spv-fin-card.ativo {
   height: 0.4rem;
   margin-top: 0.3rem;
   border-radius: 1rem;
-  background: var(--spv-surface-2, #f1f5f9);
+  background: var(--spv-surface-3);
   overflow: hidden;
 }
 

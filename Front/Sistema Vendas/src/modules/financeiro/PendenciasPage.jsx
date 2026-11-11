@@ -78,7 +78,7 @@ export default function PendenciasPage() {
       rotulo: 'Pedidos em andamento',
       valor: lista.reduce((s, l) => s + l.emAndamento, 0),
       detalhe: 'cadastrado, produção ou conferência',
-      cor: '#94a3b8',
+      cor: 'var(--spv-cor-neutra)',
       icone: 'bi-gear',
     },
   ]

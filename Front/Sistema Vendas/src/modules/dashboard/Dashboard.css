@@ -38,16 +38,17 @@
   width: min(100%, 3.5rem);
   min-height: 2px;
   border-radius: 0.35rem 0.35rem 0 0;
-  background: #9fd8c4;
+  background: color-mix(in srgb, var(--spv-emerald) 35%, transparent);
   transition: height 0.3s ease;
 }
 
 .spv-grafico-barra.destaque {
-  background: var(--spv-emerald);
+  background: linear-gradient(180deg, var(--spv-mint), var(--spv-emerald));
+  box-shadow: 0 0 18px -4px rgba(6, 214, 160, 0.6);
 }
 
 .spv-grafico-coluna:hover .spv-grafico-barra {
-  filter: brightness(0.92);
+  filter: brightness(1.2);
 }
 
 .spv-grafico-rotulo {
@@ -62,7 +63,7 @@
   display: block;
   height: 0.5rem;
   border-radius: 1rem;
-  background: var(--spv-surface-2, #f1f5f9);
+  background: var(--spv-surface-3);
   overflow: hidden;
 }
 
@@ -118,9 +119,9 @@
   max-width: 1024px;
   margin: 0 auto;
   border: 1px solid var(--spv-border);
-  border-radius: 0.5rem;
+  border-radius: var(--spv-raio);
   overflow: hidden;
-  background: #fff;
+  background: var(--spv-surface-2);
 }
 
 .spv-bi iframe {

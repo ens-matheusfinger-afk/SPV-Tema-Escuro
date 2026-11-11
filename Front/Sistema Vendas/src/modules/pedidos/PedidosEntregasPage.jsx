@@ -94,7 +94,7 @@ export default function PedidosEntregasPage() {
       rotulo: 'Próximos 7 dias',
       valor: nestaSemana.length,
       detalhe: formatarMoeda(soma(nestaSemana)),
-      cor: '#f5b400',
+      cor: 'var(--spv-cor-atencao)',
       icone: 'bi-calendar-week',
     },
     {

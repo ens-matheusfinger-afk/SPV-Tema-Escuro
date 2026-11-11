@@ -11,5 +11,5 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: #8a6100;
+  color: var(--spv-texto-atencao);
 }

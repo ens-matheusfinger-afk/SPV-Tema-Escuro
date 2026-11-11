@@ -83,7 +83,7 @@ export default function ContasPagarPage() {
       chave: 'proximas',
       rotulo: `Próximos ${DIAS_PREVISAO} dias`,
       lista: proximas,
-      cor: '#f5b400',
+      cor: 'var(--spv-cor-atencao)',
       icone: 'bi-calendar-week',
     },
     {

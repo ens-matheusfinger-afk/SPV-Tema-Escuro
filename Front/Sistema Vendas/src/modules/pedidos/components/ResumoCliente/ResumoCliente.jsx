@@ -48,7 +48,7 @@ export default function ResumoCliente({ pedidos }) {
       valor: ultimo ? formatarData(ultimo) : '—',
       detalhe: `${pedidos.length} pedido(s) no total`,
       icone: 'bi-calendar3',
-      cor: '#94a3b8',
+      cor: 'var(--spv-cor-neutra)',
     },
   ]
 
